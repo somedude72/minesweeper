@@ -3,6 +3,7 @@
 #include "model/data.h"
 
 #include <QPushButton>
+#include <QMouseEvent>
 #include <QWidget>
 
 namespace view {
@@ -17,12 +18,13 @@ namespace view {
     private slots:
         // This slot catches the signal emitted by the base class when the button is
         // clicked. It then emits a new clicked signal with the id of the button as its
-        // parameter. 
-        void on_clicked() const;
+        // parameter. (QWidget/QPushButton mouse press event override)
+        void mouseReleaseEvent(QMouseEvent* event) override;
 
     signals:
         // Signal for when the button is clicked (has id as parameter)
-        void clicked(const model::MineCoord& id) const;
+        void left_clicked(const model::MineCoord& id) const;
+        void right_clicked(const model::MineCoord& id) const;
 
     private:
         model::MineCoord m_coord;

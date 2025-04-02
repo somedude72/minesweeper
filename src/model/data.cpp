@@ -89,6 +89,7 @@ namespace model {
                 m_board[i][j].is_mine = is_mine;
                 m_board[i][j].is_revealed = false;
                 m_board[i][j].adjacent_mines = 0;
+                m_board[i][j].is_marked = false;
             }
         }
     }

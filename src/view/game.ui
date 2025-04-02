@@ -34,11 +34,11 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>781</width>
-      <height>561</height>
+      <width>791</width>
+      <height>571</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="vbox" stretch="0,5">
+    <layout class="QVBoxLayout" name="vbox" stretch="0,1">
      <property name="spacing">
       <number>-1</number>
      </property>
@@ -70,6 +70,12 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>55</width>
+           <height>55</height>
+          </size>
          </property>
          <property name="text">
           <string>Restart</string>
