@@ -1,5 +1,7 @@
 #pragma once
 
+#include "model/data.h"
+
 #include <QPushButton>
 #include <QWidget>
 
@@ -10,8 +12,7 @@ namespace view {
     class MineButton : public QPushButton {
         Q_OBJECT
     public:
-        MineButton(QWidget* parent = nullptr);
-        ~MineButton() = default;
+        MineButton(const model::MineCoord& coord, QWidget* parent = nullptr);
 
     private slots:
         // This slot catches the signal emitted by the base class when the button is
@@ -21,7 +22,10 @@ namespace view {
 
     signals:
         // Signal for when the button is clicked (has id as parameter)
-        void clicked(const QString& id) const;
+        void clicked(const model::MineCoord& id) const;
+
+    private:
+        model::MineCoord m_coord;
 
     };
 

@@ -5,11 +5,20 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
+# Packages
+find_package(spdlog REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
+# Minesweeper app
 add_subdirectory(src)
 target_include_directories(minesweeper PUBLIC src)
-target_link_libraries(minesweeper PUBLIC Qt::Core Qt::Gui Qt::Widgets)
+target_link_libraries(minesweeper PUBLIC
+    Qt::Core
+    Qt::Gui
+    Qt::Widgets
+    spdlog::spdlog
+)
+
 set_target_properties(minesweeper PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE

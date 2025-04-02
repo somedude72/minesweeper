@@ -30,7 +30,7 @@ namespace model {
         void floodfill(const MineCoord& start);
 
         const MineSquare& get_square(const MineCoord& get_coord) const;
-        void set_square(const MineCoord& set_coord, const MineSquare& value);
+        MineSquare& get_square(const MineCoord& get_coord);
 
         int32_t row_size() const;
         int32_t col_size() const;

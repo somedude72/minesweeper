@@ -1,15 +1,15 @@
 #include "view/button.h"
-#include <iostream>
+#include "model/data.h"
 
 namespace view {
 
-    MineButton::MineButton(QWidget* parent) : QPushButton(parent) {
+    MineButton::MineButton(const model::MineCoord& coord, QWidget* parent) : QPushButton(parent) {
         connect(this, &QPushButton::clicked, this, &MineButton::on_clicked);
+        m_coord = coord;
     }
 
     void MineButton::on_clicked() const {
-        std::cout << "[button] clicked " << objectName().toStdString() << '\n';
-        emit clicked(objectName());
+        emit clicked(m_coord);
     }
 
 } // namespace view
