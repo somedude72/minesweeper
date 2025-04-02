@@ -66,8 +66,8 @@ namespace model {
         return m_board[get_coord.row][get_coord.col];
     }
 
-    void MineBoard::set_square(const MineCoord& set_coord, const MineSquare& value) {
-        m_board[set_coord.row][set_coord.col] = value;
+    MineSquare& MineBoard::get_square(const MineCoord& get_coord) {
+        return m_board[get_coord.row][get_coord.col];
     }
 
     int32_t MineBoard::row_size() const {
@@ -85,7 +85,7 @@ namespace model {
         
         for (int32_t i = 0; i < max_row; i++) {
             for (int32_t j = 0; j < max_col; j++) {
-                bool is_mine = random_num(0, 15) == 1;
+                bool is_mine = random_num(0, 8) == 1;
                 m_board[i][j].is_mine = is_mine;
                 m_board[i][j].is_revealed = false;
                 m_board[i][j].adjacent_mines = 0;
