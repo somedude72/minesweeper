@@ -14,8 +14,13 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
     m_window = new view::MineWindow(m_board);
     connect(m_window, &view::MineWindow::restart, this, &App::on_restart);
     connect(m_window, &view::MineWindow::reveal, this, &App::on_reveal);
+    connect(m_window, &view::MineWindow::mark, this, &App::on_mark);
     
     m_window->show();
+}
+
+App::~App() {
+    delete m_window;
 }
 
 void App::game_over() {
@@ -31,9 +36,16 @@ void App::on_restart() {
     m_window->update_board(m_board);
 }
 
+void App::on_mark(const model::MineCoord& coord) {
+    spdlog::debug("marking ({}, {})", coord.row, coord.col);
+    model::MineSquare& curr = m_board.get_square(coord);
+    curr.is_marked = true;
+    m_window->update_board(m_board);
+}
+
 void App::on_reveal(const model::MineCoord& coord) {
     spdlog::debug("revealing ({}, {})", coord.row, coord.col);
-    model::MineSquare curr = m_board.get_square(coord);
+    model::MineSquare& curr = m_board.get_square(coord);
     if (curr.is_mine) {
         game_over();
     } else {

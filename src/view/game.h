@@ -21,10 +21,12 @@ namespace view {
     private slots:
         void on_restart() const;
         void on_reveal(const model::MineCoord& coord) const;
+        void on_mark(const model::MineCoord& coord) const;
 
     signals:
         void restart() const;
         void reveal(const model::MineCoord& coord) const;
+        void mark(const model::MineCoord& coord) const;
 
     private:
         // We do not need to manually deallocate the buttons because the QMainWindow class
