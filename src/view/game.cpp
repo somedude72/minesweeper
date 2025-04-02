@@ -2,7 +2,7 @@
 #include "view/button.h"
 
 #include <QString>
-#include <QFont>
+#include <QSizePolicy>
 #include <cstdint>
 
 namespace view {
@@ -21,7 +21,7 @@ namespace view {
         for (int32_t i = 0; i < row_size; i++) {
             for (int32_t j = 0; j < col_size; j++) {
                 buttons[i][j] = new MineButton({ i, j }, this);
-                vbox_board->addWidget(buttons[i][j], i, j);
+                grid_board->addWidget(buttons[i][j], i, j);
                 connect(buttons[i][j], &MineButton::right_clicked, this, &MineWindow::on_mark);
                 connect(buttons[i][j], &MineButton::left_clicked, this, &MineWindow::on_reveal);
                 
@@ -45,7 +45,7 @@ namespace view {
     void MineWindow::clear_board() {
         for (int32_t i = 0; i < buttons.size(); i++) {
             for (int32_t j = 0; j < buttons[0].size(); j++) {
-                vbox_board->removeWidget(buttons[i][j]);
+                grid_board->removeWidget(buttons[i][j]);
                 buttons[i][j]->deleteLater();
                 buttons[i][j] = nullptr;
             }
