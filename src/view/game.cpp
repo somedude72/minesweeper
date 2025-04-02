@@ -22,13 +22,15 @@ namespace view {
             for (int32_t j = 0; j < col_size; j++) {
                 buttons[i][j] = new MineButton({ i, j }, this);
                 vbox_board->addWidget(buttons[i][j], i, j);
-                connect(buttons[i][j], &MineButton::clicked, this, &MineWindow::on_reveal);
+                connect(buttons[i][j], &MineButton::right_clicked, this, &MineWindow::on_mark);
+                connect(buttons[i][j], &MineButton::left_clicked, this, &MineWindow::on_reveal);
                 
                 model::MineSquare curr_square = new_state.get_square({ i, j });
 
                 if (!curr_square.is_revealed) {
+                    QString btn_text = curr_square.is_marked ? "🚩" : "";
                     buttons[i][j]->setDisabled(false);
-                    buttons[i][j]->setText("");
+                    buttons[i][j]->setText(btn_text);
                 } else if (!curr_square.is_mine) {
                     buttons[i][j]->setDisabled(true);
                     buttons[i][j]->setText(QString::number(curr_square.adjacent_mines));
@@ -56,6 +58,10 @@ namespace view {
 
     void MineWindow::on_reveal(const model::MineCoord& coord) const {
         emit reveal(coord);
+    }
+
+    void MineWindow::on_mark(const model::MineCoord& coord) const {
+        emit mark(coord);
     }
 
 } // namespace view

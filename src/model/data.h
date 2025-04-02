@@ -12,7 +12,7 @@ namespace model {
 
     struct MineSquare {
         int adjacent_mines;
-        bool is_mine, is_revealed;
+        bool is_mine, is_revealed, is_marked;
     };
 
     class MineBoard {
