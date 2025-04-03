@@ -1,4 +1,4 @@
-#include "QAPplication"
+#include "QApplication"
 #include "spdlog/spdlog.h"
 
 #include "app/app.h"
