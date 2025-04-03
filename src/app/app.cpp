@@ -48,6 +48,9 @@ void App::on_reveal(const model::MineCoord& coord) {
     model::MineSquare& curr = m_board.get_square(coord);
     if (curr.is_mine) {
         game_over();
+    } else if (curr.adjacent_mines) {
+        m_board.get_square(coord).is_revealed = true;
+        m_window->update_board(m_board);
     } else {
         m_board.floodfill(coord);
         m_window->update_board(m_board);
