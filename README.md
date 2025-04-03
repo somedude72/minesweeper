@@ -14,12 +14,20 @@ to build.
 
 #### macOS/Linux
 
-You will need to have the following libraries/packages installed on your system through
-your preferred package manager:
+You will need a valid C++17 compiler toolchain to build this program (e.g. the 
+`build-essensial` package on most linux distributions). You will also need to have the
+following libraries/packages installed on your system through your preferred package
+manager:
 
  + `CMake`
- + `Qt6`
  + `spdlog`
+ + `Qt6`
+
+For example, this can be done on Debian distributions using the following command:
+
+```bash
+$ sudo apt install cmake libspdlog-dev qt6-base-dev
+```
 
 If you have installed them on non-standard paths, you may need to specify additional
 environmental variables for CMake to detect the libraries and header files. Otherwise, you
