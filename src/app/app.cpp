@@ -39,7 +39,7 @@ void App::on_restart() {
 void App::on_mark(const model::MineCoord& coord) {
     spdlog::debug("marking ({}, {})", coord.row, coord.col);
     model::MineSquare& curr = m_board.get_square(coord);
-    curr.is_marked = true;
+    curr.is_marked = !curr.is_marked;
     m_window->update_board(m_board);
 }
 
