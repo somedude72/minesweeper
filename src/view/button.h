@@ -2,9 +2,9 @@
 
 #include "model/data.h"
 
-#include <QPushButton>
-#include <QMouseEvent>
-#include <QWidget>
+#include "QPushButton"
+#include "QMouseEvent"
+#include "QWidget"
 
 namespace view {
 
