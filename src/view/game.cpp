@@ -1,5 +1,6 @@
 #include "view/game.h"
 #include "view/button.h"
+#include "spdlog/spdlog.h"
 
 #include "QString"
 #include "QSizePolicy"
@@ -11,8 +12,13 @@ namespace view {
     MineWindow::MineWindow(const model::MineBoard& init_state, QWidget* parent) : QMainWindow(parent) {
         setupUi(this);
         adjustSize();
-        connect(m_ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::on_restart);
+        
+        spdlog::debug("window size: {}, {}", size().width(), size().height());
+        setMaximumHeight(size().height());
+        setMaximumWidth(size().width());
+        
         update_board(init_state);
+        connect(m_ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::on_restart);
     }
     
     void MineWindow::update_board(const model::MineBoard& new_state) {
@@ -25,7 +31,7 @@ namespace view {
         for (int32_t i = 0; i < row_size; i++) {
             for (int32_t j = 0; j < col_size; j++) {
                 buttons[i][j] = new MineButton({ i, j }, this);
-                buttons[i][j]->setFixedSize(50, 50);
+                buttons[i][j]->setFixedSize(30, 30);
                 buttons[i][j]->setContentsMargins(0, 0, 0, 0);
 
                 m_grid_board->addWidget(buttons[i][j], i, j);
