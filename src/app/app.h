@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QApplication>
+#include "QApplication"
 
 #include "view/game.h"
 #include "model/data.h"
