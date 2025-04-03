@@ -85,7 +85,7 @@ namespace model {
         
         for (int32_t i = 0; i < max_row; i++) {
             for (int32_t j = 0; j < max_col; j++) {
-                bool is_mine = random_num(0, 8) == 1;
+                bool is_mine = random_num(1, 10) == 1;
                 m_board[i][j].is_mine = is_mine;
                 m_board[i][j].is_revealed = false;
                 m_board[i][j].adjacent_mines = 0;
