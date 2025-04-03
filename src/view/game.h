@@ -3,8 +3,9 @@
 #include "view/button.h"
 #include "view/ui_game.h"
 #include "model/data.h"
-#include <QWidget>
-#include <QString>
+
+#include "QWidget"
+#include "QString"
 
 namespace view {
 
