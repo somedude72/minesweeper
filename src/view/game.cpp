@@ -10,24 +10,29 @@ namespace view {
 
     MineWindow::MineWindow(const model::MineBoard& init_state, QWidget* parent) : QMainWindow(parent) {
         setupUi(this);
+        adjustSize();
         connect(m_ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::on_restart);
         update_board(init_state);
     }
-
+    
     void MineWindow::update_board(const model::MineBoard& new_state) {
         clear_board();
         int32_t row_size = new_state.row_size();
         int32_t col_size = new_state.col_size();
+
+        m_grid_board->setSpacing(0);
         buttons.resize(row_size, std::vector<MineButton*>(col_size, nullptr));
         for (int32_t i = 0; i < row_size; i++) {
             for (int32_t j = 0; j < col_size; j++) {
                 buttons[i][j] = new MineButton({ i, j }, this);
+                buttons[i][j]->setFixedSize(50, 50);
+                buttons[i][j]->setContentsMargins(0, 0, 0, 0);
+
                 m_grid_board->addWidget(buttons[i][j], i, j);
                 connect(buttons[i][j], &MineButton::right_clicked, this, &MineWindow::on_mark);
                 connect(buttons[i][j], &MineButton::left_clicked, this, &MineWindow::on_reveal);
-                
-                model::MineSquare curr_square = new_state.get_square({ i, j });
 
+                model::MineSquare curr_square = new_state.get_square({ i, j });
                 if (!curr_square.is_revealed) {
                     QString btn_text = curr_square.is_marked ? "🚩" : "";
                     buttons[i][j]->setDisabled(false);
