@@ -9,13 +9,13 @@ earlier Windows versions.
 
 This project has not been tested on Windows. Although the code should be completely
 portable in theory because of Qt, it has never been built on Windows. Therefore, this
-section will remain under construction until I can get my hands on a Windows machine
-to build.
+section will remain under construction until I get my hands on a Windows machine to test
+drive building minesweeper.
 
 #### macOS/Linux
 
 You will need a valid C++17 compiler toolchain to build this program (e.g. the 
-`build-essensial` package on most linux distributions). You will also need to have the
+`build-essential` package on most linux distributions). You will also need to have the
 following libraries/packages installed on your system through your preferred package
 manager:
 
