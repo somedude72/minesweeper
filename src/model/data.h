@@ -6,13 +6,12 @@ namespace model {
 
     struct MineCoord {
         int32_t row, col;
-        bool operator==(const MineCoord& other) const;
-        bool operator!=(const MineCoord& other) const;
     };
 
     struct MineSquare {
-        int adjacent_mines;
-        bool is_mine, is_revealed, is_marked;
+        int adjacent_mines = 0;
+        bool is_mine = false, is_marked = false;
+        bool is_revealed = false, is_reason_for_end = false;
     };
 
     class MineBoard {
