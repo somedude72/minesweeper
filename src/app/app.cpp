@@ -1,14 +1,14 @@
 #include "QApplication"
-#include "spdlog/spdlog.h"
 
 #include "app/app.h"
 #include "view/game.h"
 #include "model/data.h"
+#include "config.h"
 
 App::App(int argc, char** argv) : QApplication(argc, argv) {
-    spdlog::set_level(spdlog::level::debug);
-    spdlog::set_pattern("[%a, %b %d %H:%M:%S] [%l] %v");
-    spdlog::info("app: logging initiated (this is a test message)");
+    SET_LOG_PRIORITY(DEBUG_LEVEL);
+    SET_LOG_PATTERN("[%a, %b %d %H:%M:%S] [%l] %v");
+    LOG_INFO("app: logging initiated (this is a test message)");
     
     m_board = model::MineBoard(10, 15);
     m_window = new view::MineWindow(m_board);
@@ -22,12 +22,12 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
 
 App::~App() {
     delete m_window;
-    spdlog::info("app: deallocated window object");
-    spdlog::info("app: terminating application");
+    LOG_INFO("app: deallocated window object");
+    LOG_INFO("app: terminating application");
 }
 
 void App::game_over(const model::MineCoord& cause) {
-    spdlog::info("app: game over due to revealing mine");
+    LOG_INFO("app: game over due to revealing mine");
     for (int32_t i = 0; i < m_board.row_size(); i++) {
         for (int32_t j = 0; j < m_board.col_size(); j++) {
             if (!m_board.get_square({ i, j }).is_mine)
@@ -45,13 +45,13 @@ void App::game_over(const model::MineCoord& cause) {
 }
 
 void App::on_restart() {
-    spdlog::info("app: received restart game signal");
+    LOG_INFO("app: received restart game signal");
     m_board = model::MineBoard(10, 15);
     m_window->update_board(m_board);
 }
 
 void App::on_mark(const model::MineCoord& coord) {
-    spdlog::info("app: received mark signal at ({}, {})", coord.row, coord.col);
+    LOG_INFO("app: received mark signal at ({}, {})", coord.row, coord.col);
     model::MineSquare& square = m_board.get_square(coord);
     
     square.is_marked = !square.is_marked;
@@ -59,7 +59,7 @@ void App::on_mark(const model::MineCoord& coord) {
 }
 
 void App::on_reveal(const model::MineCoord& coord) {
-    spdlog::info("app: received reveal signal at ({}, {})", coord.row, coord.col);
+    LOG_INFO("app: received reveal signal at ({}, {})", coord.row, coord.col);
     model::MineSquare& square = m_board.get_square(coord);
 
     if (square.is_mine) {
