@@ -1,6 +1,6 @@
 #include "view/game.h"
 #include "view/button.h"
-#include "spdlog/spdlog.h"
+#include "config.h"
 
 #include "QString"
 #include "QSizePolicy"
@@ -13,8 +13,8 @@ namespace view {
         setupUi(this);
         adjustSize();
         
-        spdlog::info("window: initializing main ui");
-        spdlog::info("window: fixed size is {}, {}", size().width(), size().height());
+        LOG_INFO("window: initializing main ui");
+        LOG_INFO("window: fixed size is {}, {}", size().width(), size().height());
         setMaximumHeight(size().height());
         setMaximumWidth(size().width());
         
