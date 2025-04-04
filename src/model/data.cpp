@@ -1,6 +1,5 @@
 #include "model/data.h"
-
-#include "spdlog/spdlog.h"
+#include "config.h"
 
 #include <ctime>
 #include <cassert>
@@ -24,7 +23,7 @@ int32_t random_num(int32_t lower_range, int32_t upper_range) {
 namespace model {
 
 MineBoard::MineBoard(uint32_t row_num, uint32_t col_num) {
-    spdlog::info("board: initializing {} by {} board", row_num, col_num);
+    LOG_INFO("board: initializing {} by {} board", row_num, col_num);
     m_board.resize(row_num, std::vector<MineSquare>(col_num));
     generate_mines();
     count_adjacent();
