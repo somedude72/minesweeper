@@ -11,7 +11,7 @@ public:
     ~App();
 
 private:
-    void game_over();
+    void game_over(const model::MineCoord& cause);
 
 private slots:
     void on_restart();
