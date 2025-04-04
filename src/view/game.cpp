@@ -13,11 +13,14 @@ namespace view {
         setupUi(this);
         adjustSize();
         
-        spdlog::debug("window size: {}, {}", size().width(), size().height());
+        spdlog::info("window: initializing main ui");
+        spdlog::info("window: fixed size is {}, {}", size().width(), size().height());
         setMaximumHeight(size().height());
         setMaximumWidth(size().width());
         
         update_board(init_state);
+        m_grid_board->setSpacing(0);
+
         connect(m_ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::on_restart);
     }
     
@@ -25,8 +28,7 @@ namespace view {
         clear_board();
         int32_t row_size = new_state.row_size();
         int32_t col_size = new_state.col_size();
-
-        m_grid_board->setSpacing(0);
+        
         buttons.resize(row_size, std::vector<MineButton*>(col_size, nullptr));
         for (int32_t i = 0; i < row_size; i++) {
             for (int32_t j = 0; j < col_size; j++) {
