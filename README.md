@@ -14,22 +14,19 @@ drive building minesweeper.
 
 #### macOS/Linux
 
-You will need a valid C++17 compiler toolchain to build this program (e.g. the 
-`build-essential` package on most linux distributions). You will also need to have the
-following libraries/packages installed on your system through your preferred package
-manager:
+You will need CMake and a valid C++17 compiler toolchain. You will also need to install
+the following packages to build the project:
 
- + `CMake`
- + `spdlog`
- + `Qt6`
+ + Qt6 (required)
+ + Spdlog (optional)
 
 For example, this can be done on Debian distributions using the following command:
 
 ```bash
-$ sudo apt install cmake libspdlog-dev qt6-base-dev
+$ sudo apt install qt6-base-dev libspdlog-dev
 ```
 
-If you have installed them on non-standard paths, you may need to specify additional
+Additionally, if you have installed Qt on non-standard paths, you may need to specify
 environmental variables for CMake to detect the libraries and header files. Otherwise, you
 may proceed with building the app by the following steps:
 
@@ -42,10 +39,14 @@ $ cd minesweeper
 
 ```bash
 $ mkdir build && cd build
-$ cmake .. && cmake --build .
+$ cmake .. && cmake --build . 
+$ cmake --install .
 ```
 
- + The resulting executable should be visible at `build/src/minesweeper`.
+On macOS, the dynamically linked Qt and spdlog libraries are not included within the
+generated .app bundle by default. Therefore, if you desire to build a redistributable
+application bundle, you may have to use the `macdeployqt` tool to copy the libraries into
+the bundle. 
 
 ## Notes
 
