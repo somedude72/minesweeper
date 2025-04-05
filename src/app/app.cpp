@@ -10,7 +10,7 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
     SET_LOG_PATTERN("[%a, %b %d %H:%M:%S] [%l] %v");
     LOG_INFO("app: logging initiated (this is a test message)");
     
-    m_board = model::MineBoard(10, 15);
+    m_board = model::MineBoard(9, 9);
     m_window = new view::MineWindow(m_board);
     m_window->setWindowFlags(Qt::FramelessWindowHint);
 
@@ -50,7 +50,7 @@ void App::game_over(const model::MineCoord& cause) {
 void App::on_restart() {
     LOG_INFO("app: received restart game signal");
 
-    m_board = model::MineBoard(10, 15);
+    m_board = model::MineBoard(9, 9);
     m_window->update_board(m_board, false, false);
     is_game_over = false;
 }
@@ -68,7 +68,7 @@ void App::on_mark(const model::MineCoord& coord) {
 }
 
 void App::on_reveal(const model::MineCoord& coord) {
-    if (is_game_over) {
+    if (is_game_over || m_board.get_square(coord).is_marked) {
         return;
     }
 

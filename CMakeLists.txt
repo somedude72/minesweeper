@@ -38,6 +38,7 @@ qt_add_resources(minesweeper "assets"
         assets/ms-win.png
         assets/ms-smile.png
         assets/ms-flag.png
+        assets/ms-cross.png
         assets/ms-mine.png
         assets/ms-numbers.ttf
 )
