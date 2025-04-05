@@ -130,7 +130,7 @@ QPushButton#ctrl_button_restart:pressed {
          </property>
          <layout class="QGridLayout" name="board_widget_layout">
           <property name="leftMargin">
-           <number>16</number>
+           <number>15</number>
           </property>
           <property name="topMargin">
            <number>8</number>
@@ -155,13 +155,13 @@ QPushButton#ctrl_button_restart:pressed {
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>100</height>
+           <height>82</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>100</height>
+           <height>75</height>
           </size>
          </property>
          <layout class="QGridLayout" name="control_widget_layout" columnstretch="0,1,0,1">
@@ -190,13 +190,13 @@ QPushButton#ctrl_button_restart:pressed {
             </property>
             <property name="minimumSize">
              <size>
-              <width>55</width>
+              <width>32</width>
               <height>55</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>1000</width>
+              <width>75</width>
               <height>1000</height>
              </size>
             </property>
