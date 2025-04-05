@@ -3,10 +3,9 @@
 #include "utils/config.h"
 
 #include "QString"
-#include "QSizePolicy"
 #include "QFontDatabase"
-#include "QFile"
-#include "QStyle"
+#include "QIcon"
+#include "QPixmap"
 
 #include <cstdint>
 
@@ -23,7 +22,7 @@ MineWindow::MineWindow(const model::MineBoard& init_state, QWidget* parent) : QM
     board_widget_layout->setVerticalSpacing(12);
     board_widget_layout->setHorizontalSpacing(0);
 
-    ctrl_button_restart->setIconSize(QSize(35, 35));
+    ctrl_button_restart->setIconSize(QSize(27, 27));
     
     connect(ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::on_restart);
     update_board(init_state, false, false);
@@ -59,9 +58,14 @@ void MineWindow::update_board(const model::MineBoard& new_state, bool lose, bool
 }
 
 void MineWindow::render_button(const model::MineSquare& s, MineButton* button, bool lose, bool win) {
-    const QIcon flag(":/assets/ms-flag.png");
-    const QIcon mine(":/assets/ms-mine.png");
-    const QIcon none;
+    QIcon flag, mine, redx, none;
+    flag.addPixmap(QPixmap(":/assets/ms-flag.png"), QIcon::Disabled);
+    mine.addPixmap(QPixmap(":/assets/ms-mine.png"), QIcon::Disabled);
+    redx.addPixmap(QPixmap(":/assets/ms-cross.png"), QIcon::Disabled);
+    flag.addPixmap(QPixmap(":/assets/ms-flag.png"), QIcon::Normal);
+    mine.addPixmap(QPixmap(":/assets/ms-mine.png"), QIcon::Normal);
+    redx.addPixmap(QPixmap(":/assets/ms-cross.png"), QIcon::Normal);
+
 
     // From https://stackoverflow.com/questions/30973781/qt-add-custom-font-from-resource
     int id = QFontDatabase::addApplicationFont(":/assets/ms-numbers.ttf");
@@ -76,31 +80,26 @@ void MineWindow::render_button(const model::MineSquare& s, MineButton* button, b
     const bool is_end_reason = s.is_end_reason;
 
     if (!is_reveal) {
-        button->setObjectName(lose ? "end" : "regular");
-        button->setText(win ? "0" : "");
-        button->setIcon(is_mark && !win ? flag : none);
+        button->setObjectName(lose || is_mark ? "unclickable" : "regular");
+        button->setIcon(is_mark ? flag : none);
         button->setDisabled(false);
     } else {
         if (is_mine) {
-            button->setObjectName(is_end_reason ? "end_bomb" : "end"); // For stylesheet
-            button->setText("!"); // The ! character is the bomb icon in the custom font
-            button->setIcon(none);
+            button->setObjectName(is_end_reason ? "red_background" : "unclickable"); // For stylesheet
+            button->setIcon(is_mark ? redx : mine);
             button->setDisabled(true);
         } else if (is_adj) {
             // The font pack is messed up; The 74th character in the ascii table (which is
             // supposed to be an uppercase J) is the start of the numbers 0-9. Therefore,
             // we add s.adjacent_mines to 74 to convert it into the appropriate ascii
-            // code.
+            // code for the font pack.
             char16_t c[2] = { (char16_t) (74 + s.adjacent_mines), '\0' };
             QString temp = QString::fromUtf16(c);
             button->setObjectName("mine_" + QString::number(s.adjacent_mines)); // For stylesheet
             button->setText(temp);
-            button->setIcon(none);
             button->setDisabled(true);
         } else {
-            button->setObjectName(lose ? "end" : "regular");
-            button->setText("");
-            button->setIcon(none);
+            button->setObjectName(lose ? "unclickable" : "regular");
             button->setDisabled(true);
         }
     }

@@ -34,7 +34,7 @@ QPushButton#regular:disabled {
 }
 
 /* End game button styles (static) */
-QPushButton#end {
+QPushButton#unclickable {
     border: 0px solid gray;
     border-right: 4px solid gray;
     border-bottom: 4px solid gray;
@@ -44,7 +44,7 @@ QPushButton#end {
     color: rgb(0, 0, 0);
 }
 
-QPushButton#end:pressed {
+QPushButton#unclickable:pressed {
     border: 0px solid gray;
     border-right: 4px solid gray;
     border-bottom: 4px solid gray;
@@ -54,13 +54,13 @@ QPushButton#end:pressed {
     color: rgb(0, 0, 0);
 }
 
-QPushButton#end:disabled {
+QPushButton#unclickable:disabled {
     border: 1px solid gray;
     background-color: rgb(205, 205, 205);
     color: rgb(0, 0, 0);
 }
 
-QPushButton#end_bomb:disabled {
+QPushButton#red_background:disabled {
     border: 1px solid gray;
     background-color: rgb(255, 0, 0);
     color: rgb(0, 0, 0);
