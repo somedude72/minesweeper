@@ -16,7 +16,7 @@ public:
     // Constructs a game window with an initial state. The state will be pushed into a
     // QGridLayout, with the mine board buttons generated dynamically
     MineWindow(const model::MineBoard& init_state, QWidget* parent = nullptr);
-    void update_board(const model::MineBoard& new_state, bool lose, bool win);
+    void render_board(const model::MineBoard& new_state, bool lose, bool win);
 
 private slots:
     void on_restart() const;

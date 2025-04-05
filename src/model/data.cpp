@@ -1,5 +1,6 @@
 #include "model/data.h"
 #include "utils/config.h"
+#include "utils/config.h"
 
 #include <ctime>
 #include <cassert>
@@ -76,14 +77,15 @@ int32_t MineBoard::col_size() const {
 bool MineBoard::did_win() const {
     for (int i = 0; i < m_board.size(); i++) {
         for (int j = 0; j < m_board[0].size(); j++) {
-            if (!m_board[i][j].is_revealed && !m_board[i][j].is_revealed)
+            if (!m_board[i][j].is_revealed && !m_board[i][j].is_mine) {
                 return false;
-            if (m_board[i][j].is_revealed && m_board[i][j].is_mine) {
+            } else if (m_board[i][j].is_revealed && m_board[i][j].is_mine) {
                 return false;
             }
         }
     }
 
+    LOG_DEBUG("board: checking did_win = true");
     return true;
 }
 
