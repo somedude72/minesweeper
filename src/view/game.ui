@@ -17,9 +17,9 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Minesweeper</string>
   </property>
-  <widget class="QWidget" name="m_root">
+  <widget class="QWidget" name="root">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
      <horstretch>0</horstretch>
@@ -27,11 +27,60 @@
     </sizepolicy>
    </property>
    <property name="styleSheet">
-    <string notr="true">QWidget#m_root {
-	background-color: rgb(189, 192, 192);
+    <string notr="true">QWidget#root_grid {
+	border: 0px solid gray;
+    border-right: 4px solid gray;
+	border-bottom: 4px solid gray;
+	border-top: 4px solid white;
+	border-left: 4px solid white;
+    background-color: rgb(205, 205, 205);
+}
+
+QWidget#board_widget {
+	margin: 0px 11px 11px 11px;
+	border: 0px solid gray;
+    border-top: 4px solid gray;
+	border-left: 4px solid gray;
+	border-right: 4px solid white;
+	border-bottom: 4px solid white;
+    background-color: rgb(205, 205, 205);
+    color: rgb(0, 0, 0);
+}
+
+QWidget#control_widget {
+	margin: 11px 11px 11px 11px;
+	border: 0px solid gray;
+    border-top: 4px solid gray;
+	border-left: 4px solid gray;
+	border-right: 4px solid white;
+	border-bottom: 4px solid white;
+    background-color: rgb(205, 205, 205);
+    color: rgb(0, 0, 0);
+}
+
+QPushButton#ctrl_button_restart {
+    border: 0px solid gray;
+    border-right: 4px solid gray;
+	border-bottom: 4px solid gray;
+	border-top: 4px solid white;
+	border-left: 4px solid white;
+    background-color: rgb(205, 205, 205);
+	margin-top: 21px;
+	margin-bottom: 21px;
+    color: rgb(0, 0, 0);
+}
+        
+QPushButton#ctrl_button_restart:pressed {
+	border: 0px solid gray;
+    border-right: 4px solid white;
+	border-bottom: 4px solid white;
+	border-top: 4px solid gray;
+	border-left: 4px solid gray;
+    background-color: rgb(205, 205, 205);
+    color: rgb(0, 0, 0);
 }</string>
    </property>
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QGridLayout" name="root_layout">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -48,19 +97,11 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <widget class="QWidget" name="m_root_layout" native="true">
+     <widget class="QWidget" name="root_grid" native="true">
       <property name="styleSheet">
-       <string notr="true">QWidget#m_root_layout {
-	border: 0px solid gray;
-    	border-right: 4px solid gray;
-	border-bottom: 4px solid gray;
-	border-top: 4px solid white;
-	border-left: 4px solid white;
-    	background-color: rgb(205, 205, 205);
-    	color: rgb(0, 0, 0);
-}</string>
+       <string notr="true"/>
       </property>
-      <layout class="QGridLayout" name="m_root_grid" rowstretch="0,0">
+      <layout class="QGridLayout" name="root_grid_layout" rowstretch="0,0">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -77,37 +118,34 @@
         <number>0</number>
        </property>
        <item row="1" column="0">
-        <widget class="QWidget" name="m_board_grid" native="true">
-         <property name="styleSheet">
-          <string notr="true">QWidget#m_board_grid {
-	margin: 0px 10px 10px 10px;
-	border: 0px solid gray;
-    	border-top: 4px solid gray;
-	border-left: 4px solid gray;
-	border-right: 4px solid white;
-	border-bottom: 4px solid white;
-    	background-color: rgb(205, 205, 205);
-    	color: rgb(0, 0, 0);
-}</string>
+        <widget class="QWidget" name="board_widget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <layout class="QGridLayout" name="m_grid_board">
+         <property name="font">
+          <font/>
+         </property>
+         <layout class="QGridLayout" name="board_widget_layout">
           <property name="leftMargin">
            <number>16</number>
           </property>
           <property name="topMargin">
-           <number>6</number>
+           <number>8</number>
           </property>
           <property name="rightMargin">
            <number>16</number>
           </property>
           <property name="bottomMargin">
-           <number>16</number>
+           <number>24</number>
           </property>
          </layout>
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QWidget" name="m_control_grid" native="true">
+        <widget class="QWidget" name="control_widget" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -117,28 +155,16 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>85</height>
+           <height>100</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>75</height>
+           <height>100</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QWidget#m_control_grid {
-	margin: 10px 10px 10px 10px;
-	border: 0px solid gray;
-    	border-top: 4px solid gray;
-	border-left: 4px solid gray;
-	border-right: 4px solid white;
-	border-bottom: 4px solid white;
-    	background-color: rgb(205, 205, 205);
-    	color: rgb(0, 0, 0);
-}</string>
-         </property>
-         <layout class="QGridLayout" name="m_grid_ctrl" columnstretch="0,1,0,1,0">
+         <layout class="QGridLayout" name="control_widget_layout" columnstretch="0,1,0,1">
           <property name="sizeConstraint">
            <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
           </property>
@@ -155,7 +181,7 @@
            <number>0</number>
           </property>
           <item row="0" column="2">
-           <widget class="QPushButton" name="m_ctrl_button_restart">
+           <widget class="QPushButton" name="ctrl_button_restart">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -174,36 +200,13 @@
               <height>1000</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
-    	border: 0px solid gray;
-    	border-right: 4px solid gray;
-	border-bottom: 4px solid gray;
-	border-top: 4px solid white;
-	border-left: 4px solid white;
-    	background-color: rgb(205, 205, 205);
-	margin-top: 18px;
-	margin-bottom: 18px;
-    	color: rgb(0, 0, 0);
-}
-        
-QPushButton:pressed {
-	border: 0px solid gray;
-    	border-right: 4px solid white;
-	border-bottom: 4px solid white;
-	border-top: 4px solid gray;
-	border-left: 4px solid gray;
-    	background-color: rgb(205, 205, 205);
-    	color: rgb(0, 0, 0);
-}</string>
-            </property>
             <property name="text">
-             <string>Restart</string>
+             <string/>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <spacer name="m_ctrl_spacer_left">
+           <spacer name="ctrl_spacer_left">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
@@ -216,7 +219,7 @@ QPushButton:pressed {
            </spacer>
           </item>
           <item row="0" column="3">
-           <spacer name="m_ctrl_spacer_right">
+           <spacer name="ctrl_spacer_right">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
@@ -239,7 +242,7 @@ QPushButton:pressed {
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="m_menu">
+  <widget class="QMenuBar" name="menu">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -248,40 +251,40 @@ QPushButton:pressed {
      <height>24</height>
     </rect>
    </property>
-   <widget class="QMenu" name="m_menu_file">
+   <widget class="QMenu" name="menu_file">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="m_file_about"/>
-    <addaction name="m_file_options"/>
+    <addaction name="file_about"/>
+    <addaction name="file_options"/>
     <addaction name="separator"/>
-    <addaction name="m_file_open"/>
-    <addaction name="m_file_save"/>
-    <addaction name="m_file_save_as"/>
+    <addaction name="file_open"/>
+    <addaction name="file_save"/>
+    <addaction name="file_save_as"/>
    </widget>
-   <addaction name="m_menu_file"/>
+   <addaction name="menu_file"/>
   </widget>
-  <action name="m_file_about">
+  <action name="file_about">
    <property name="text">
     <string>About</string>
    </property>
   </action>
-  <action name="m_file_save">
+  <action name="file_save">
    <property name="text">
     <string>Save</string>
    </property>
   </action>
-  <action name="m_file_save_as">
+  <action name="file_save_as">
    <property name="text">
     <string>Save as...</string>
    </property>
   </action>
-  <action name="m_file_open">
+  <action name="file_open">
    <property name="text">
     <string>Open</string>
    </property>
   </action>
-  <action name="m_file_options">
+  <action name="file_options">
    <property name="text">
     <string>Preferences</string>
    </property>
