@@ -80,8 +80,10 @@ void MineBoard::generate_mines() {
     
     for (int32_t i = 0; i < max_row; i++) {
         for (int32_t j = 0; j < max_col; j++) {
-            bool is_mine = random_num(1, 10) == 1;
-            m_board[i][j].is_mine = is_mine;
+            if (random_num(1, 10) == 1) {
+                m_board[i][j].is_mine = true;
+                m_board[i][j].adjacent_mines = 0;
+            }
         }
     }
 }
