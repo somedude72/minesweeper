@@ -12,6 +12,7 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
     
     m_board = model::MineBoard(10, 15);
     m_window = new view::MineWindow(m_board);
+    m_window->setWindowFlags(Qt::FramelessWindowHint);
 
     connect(m_window, &view::MineWindow::restart, this, &App::on_restart);
     connect(m_window, &view::MineWindow::reveal, this, &App::on_reveal);
