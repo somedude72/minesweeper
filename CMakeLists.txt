@@ -6,9 +6,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
 
-# Packages
+
 set(LIBRARIES Qt6::Core Qt6::Gui Qt6::Widgets)
 
+# Packages
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 find_package(spdlog QUIET)
 
@@ -20,20 +21,39 @@ else()
     set(LIBRARIES ${LIBRARIES} spdlog::spdlog)
 endif()
 
-# Minesweeper app
-add_subdirectory(src)
+# Minesweeper target
+qt_add_executable(minesweeper
+    src/main.cpp
+    src/app/app.cpp
+    src/view/button.cpp
+    src/view/game.cpp
+    src/view/game.ui
+    src/model/data.cpp
+)
+
+qt_add_resources(minesweeper "assets"
+    PREFIX "/"
+    FILES
+        assets/ms-dead.png
+        assets/ms-win.png
+        assets/ms-smile.png
+        assets/ms-flag.png
+        assets/ms-mine.png
+        assets/ms-numbers.ttf
+)
+
+# Target configuration
 target_include_directories(minesweeper PRIVATE src)
 target_link_libraries(minesweeper PRIVATE ${LIBRARIES})
 
 set_target_properties(minesweeper PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
-    BUNDLE True
-    MACOSX_BUNDLE_GUI_IDENTIFIER com.zichen.minesweeper
-    MACOSX_BUNDLE_BUNDLE_NAME minesweeper
-    MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
-    MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
 )
 
+set_source_files_properties(${ASSETS}
+    PROPERTIES
+    MACOSX_PACKAGE_LOCATION "Resources/"
+)
 
 install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)

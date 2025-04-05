@@ -17,7 +17,6 @@ namespace view {
         // QGridLayout, with the mine board buttons generated dynamically
         MineWindow(const model::MineBoard& init_state, QWidget* parent = nullptr);
         void update_board(const model::MineBoard& new_state);
-        void clear_board();
 
     private slots:
         void on_restart() const;
@@ -28,6 +27,10 @@ namespace view {
         void restart() const;
         void reveal(const model::MineCoord& coord) const;
         void mark(const model::MineCoord& coord) const;
+
+    private:
+        void clear_board();
+        void render_button(const model::MineSquare& square, MineButton* button_view);
 
     private:
         // We do not need to manually deallocate the buttons because the QMainWindow class
