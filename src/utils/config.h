@@ -11,6 +11,7 @@
 
   #define SET_LOG_PRIORITY(x) spdlog::set_level(x);
   #define SET_LOG_PATTERN(x) spdlog::set_pattern(x);
+  #define SET_LOG_COLOR(x, y) 
 
   #define LOG_DEBUG(...) spdlog::debug(__VA_ARGS__)
   #define LOG_INFO(...) spdlog::info(__VA_ARGS__)
@@ -33,4 +34,4 @@
   #define LOG_WARN(...)
   #define LOG_ERR(...)
 
-#endif// DEBUG
+#endif // DEBUG

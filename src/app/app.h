@@ -11,7 +11,7 @@ public:
     ~App();
 
 private:
-    void game_over(const model::MineCoord& cause);
+    void reveal_mines(const model::MineCoord& cause);
 
 private slots:
     void on_restart();
@@ -21,6 +21,6 @@ private slots:
 private:
     model::MineBoard m_board;
     view::MineWindow* m_window;
-    bool is_game_over;
+    bool m_game_over, m_game_won;
 
 };
