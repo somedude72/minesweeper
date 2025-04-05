@@ -21,5 +21,6 @@ private slots:
 private:
     model::MineBoard m_board;
     view::MineWindow* m_window;
+    bool is_game_over;
 
 };
