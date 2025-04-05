@@ -17,18 +17,18 @@ MineWindow::MineWindow(const model::MineBoard& init_state, QWidget* parent) : QM
     
     LOG_INFO("window: initializing main ui");
     LOG_INFO("window: fixed size is {}, {}", size().width(), size().height());
-    setMaximumHeight(size().height());
-    setMaximumWidth(size().width());
+    setMaximumSize(size().width(), size().height());
     board_widget_layout->setVerticalSpacing(12);
     board_widget_layout->setHorizontalSpacing(0);
 
     ctrl_button_restart->setIconSize(QSize(27, 27));
     
     connect(ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::on_restart);
-    update_board(init_state, false, false);
+    render_board(init_state, false, false);
 }
 
-void MineWindow::update_board(const model::MineBoard& new_state, bool lose, bool win) {
+void MineWindow::render_board(const model::MineBoard& new_state, bool lose, bool win) {
+    adjustSize();
     clear_board();
     int32_t row_size = new_state.row_size();
     int32_t col_size = new_state.col_size();
@@ -51,20 +51,19 @@ void MineWindow::update_board(const model::MineBoard& new_state, bool lose, bool
             connect(buttons[i][j], &MineButton::left_clicked, this, &MineWindow::on_reveal);
             board_widget_layout->addWidget(buttons[i][j], i, j);
 
-            const model::MineSquare& curr_square = new_state.get_square({ i, j });
-            render_button(curr_square, buttons[i][j], lose, win);
+            render_button(new_state.get_square({ i, j }), buttons[i][j], lose, win);
         }
     }
 }
 
 void MineWindow::render_button(const model::MineSquare& s, MineButton* button, bool lose, bool win) {
-    QIcon flag, mine, redx, none;
+    QIcon flag, mine, marked_mine, none;
     flag.addPixmap(QPixmap(":/assets/ms-flag.png"), QIcon::Disabled);
-    mine.addPixmap(QPixmap(":/assets/ms-mine.png"), QIcon::Disabled);
-    redx.addPixmap(QPixmap(":/assets/ms-cross.png"), QIcon::Disabled);
     flag.addPixmap(QPixmap(":/assets/ms-flag.png"), QIcon::Normal);
+    mine.addPixmap(QPixmap(":/assets/ms-mine.png"), QIcon::Disabled);
     mine.addPixmap(QPixmap(":/assets/ms-mine.png"), QIcon::Normal);
-    redx.addPixmap(QPixmap(":/assets/ms-cross.png"), QIcon::Normal);
+    marked_mine.addPixmap(QPixmap(":/assets/ms-cross.png"), QIcon::Disabled);
+    marked_mine.addPixmap(QPixmap(":/assets/ms-cross.png"), QIcon::Normal);
 
 
     // From https://stackoverflow.com/questions/30973781/qt-add-custom-font-from-resource
@@ -73,33 +72,32 @@ void MineWindow::render_button(const model::MineSquare& s, MineButton* button, b
     button->setFont(QFont(family, 16));
     button->setIconSize(QSize(27, 27));
 
-    const bool is_reveal = s.is_revealed;
-    const bool is_mark = s.is_marked;
-    const bool is_adj = s.adjacent_mines;
-    const bool is_mine = s.is_mine;
-    const bool is_end_reason = s.is_end_reason;
+    const bool square_revealed = s.is_revealed;
+    const bool square_marked = s.is_marked;
+    const bool square_has_adj = s.adjacent_mines;
+    const bool square_is_mine = s.is_mine;
+    const bool square_is_end_reason = s.is_end_reason;
 
-    if (!is_reveal) {
-        button->setObjectName(lose || is_mark ? "unclickable" : "regular");
-        button->setIcon(is_mark ? flag : none);
+    if (!square_revealed) {
+        button->setObjectName(lose || square_marked || win ? "unclickable" : "regular"); // For stylesheet
+        button->setIcon(square_marked ? flag : none);
         button->setDisabled(false);
-    } else {
-        if (is_mine) {
-            button->setObjectName(is_end_reason ? "red_background" : "unclickable"); // For stylesheet
-            button->setIcon(is_mark ? redx : mine);
+    } else { // Revealed square
+        if (square_is_mine) {
+            button->setObjectName(square_is_end_reason ? "red_background" : "unclickable"); // For stylesheet
+            button->setIcon(square_marked ? marked_mine : mine);
             button->setDisabled(true);
-        } else if (is_adj) {
+        } else if (square_has_adj) {
             // The font pack is messed up; The 74th character in the ascii table (which is
             // supposed to be an uppercase J) is the start of the numbers 0-9. Therefore,
             // we add s.adjacent_mines to 74 to convert it into the appropriate ascii
             // code for the font pack.
-            char16_t c[2] = { (char16_t) (74 + s.adjacent_mines), '\0' };
-            QString temp = QString::fromUtf16(c);
+            char16_t temp[2] = { (char16_t) (74 + s.adjacent_mines), '\0' };
             button->setObjectName("mine_" + QString::number(s.adjacent_mines)); // For stylesheet
-            button->setText(temp);
+            button->setText(QString::fromUtf16(temp));
             button->setDisabled(true);
         } else {
-            button->setObjectName(lose ? "unclickable" : "regular");
+            button->setObjectName("regular");
             button->setDisabled(true);
         }
     }
