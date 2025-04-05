@@ -20,15 +20,14 @@ the following packages to build the project:
  + Qt6 (required)
  + Spdlog (optional)
 
-For example, this can be done on Debian distributions using the following command:
-
 ```bash
+# On debian-based distributions you can use the following command
 $ sudo apt install qt6-base-dev libspdlog-dev
 ```
 
-Additionally, if you have installed Qt on non-standard paths, you may need to specify
+Note that if you have installed Qt on non-standard paths, you may need to specify
 environmental variables for CMake to detect the libraries and header files. Otherwise, you
-may proceed with building the app by the following steps:
+may proceed with building the app by the following steps. 
 
  + Clone the repository
 ```bash

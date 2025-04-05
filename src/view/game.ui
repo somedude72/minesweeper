@@ -32,108 +32,210 @@
 }</string>
    </property>
    <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
     <item row="0" column="0">
-     <layout class="QGridLayout" name="m_root_grid" rowstretch="0,0,0">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <item row="2" column="0">
-       <layout class="QGridLayout" name="m_grid_board"/>
-      </item>
-      <item row="0" column="0">
-       <layout class="QGridLayout" name="m_grid_ctrl" columnstretch="0,1,0,1,0">
-        <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
-        </property>
-        <item row="0" column="2">
-         <widget class="QPushButton" name="m_ctrl_button_restart">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>55</width>
-            <height>55</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">
-    QPushButton {
-    	border: 0px solid gray;
+     <widget class="QWidget" name="m_root_layout" native="true">
+      <property name="styleSheet">
+       <string notr="true">QWidget#m_root_layout {
+	border: 0px solid gray;
     	border-right: 4px solid gray;
-        border-bottom: 4px solid gray;
-        border-top: 4px solid white;
-        border-left: 4px solid white;
-    	background-color: rgb(205, 205, 205);
-    	color: rgb(0, 0, 0);
-    }
-        
-    QPushButton:pressed {
-        border: 0px solid gray;
-    	border-right: 4px solid white;
-        border-bottom: 4px solid white;
-        border-top: 4px solid gray;
-        border-left: 4px solid gray;
-    	background-color: rgb(205, 205, 205);
-    	color: rgb(0, 0, 0);
-    }
-        
-    QPushButton:disabled {
-        border: 0.5px solid black;
+	border-bottom: 4px solid gray;
+	border-top: 4px solid white;
+	border-left: 4px solid white;
     	background-color: rgb(205, 205, 205);
     	color: rgb(0, 0, 0);
 }</string>
+      </property>
+      <layout class="QGridLayout" name="m_root_grid" rowstretch="0,0">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item row="1" column="0">
+        <widget class="QWidget" name="m_board_grid" native="true">
+         <property name="styleSheet">
+          <string notr="true">QWidget#m_board_grid {
+	margin: 0px 10px 10px 10px;
+	border: 0px solid gray;
+    	border-top: 4px solid gray;
+	border-left: 4px solid gray;
+	border-right: 4px solid white;
+	border-bottom: 4px solid white;
+    	background-color: rgb(205, 205, 205);
+    	color: rgb(0, 0, 0);
+}</string>
+         </property>
+         <layout class="QGridLayout" name="m_grid_board">
+          <property name="leftMargin">
+           <number>16</number>
           </property>
-          <property name="text">
-           <string>Restart</string>
+          <property name="topMargin">
+           <number>6</number>
           </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <spacer name="m_ctrl_spacer_left">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+          <property name="rightMargin">
+           <number>16</number>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
+          <property name="bottomMargin">
+           <number>16</number>
           </property>
-         </spacer>
-        </item>
-        <item row="0" column="3">
-         <spacer name="m_ctrl_spacer_right">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QWidget" name="m_control_grid" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>85</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>75</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QWidget#m_control_grid {
+	margin: 10px 10px 10px 10px;
+	border: 0px solid gray;
+    	border-top: 4px solid gray;
+	border-left: 4px solid gray;
+	border-right: 4px solid white;
+	border-bottom: 4px solid white;
+    	background-color: rgb(205, 205, 205);
+    	color: rgb(0, 0, 0);
+}</string>
+         </property>
+         <layout class="QGridLayout" name="m_grid_ctrl" columnstretch="0,1,0,1,0">
+          <property name="sizeConstraint">
+           <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
           </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Policy::Preferred</enum>
+          <property name="leftMargin">
+           <number>0</number>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
+          <property name="topMargin">
+           <number>0</number>
           </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="0">
-       <widget class="QWidget" name="m_spacer_widget" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-     </layout>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="m_ctrl_button_restart">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>55</width>
+              <height>55</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>1000</width>
+              <height>1000</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    	border: 0px solid gray;
+    	border-right: 4px solid gray;
+	border-bottom: 4px solid gray;
+	border-top: 4px solid white;
+	border-left: 4px solid white;
+    	background-color: rgb(205, 205, 205);
+	margin-top: 18px;
+	margin-bottom: 18px;
+    	color: rgb(0, 0, 0);
+}
+        
+QPushButton:pressed {
+	border: 0px solid gray;
+    	border-right: 4px solid white;
+	border-bottom: 4px solid white;
+	border-top: 4px solid gray;
+	border-left: 4px solid gray;
+    	background-color: rgb(205, 205, 205);
+    	color: rgb(0, 0, 0);
+}</string>
+            </property>
+            <property name="text">
+             <string>Restart</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <spacer name="m_ctrl_spacer_left">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="3">
+           <spacer name="m_ctrl_spacer_right">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Policy::Preferred</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>

@@ -4,6 +4,9 @@
 
 #include "QString"
 #include "QSizePolicy"
+#include "QFontDatabase"
+#include "QFile"
+#include "QStyle"
 
 #include <cstdint>
 
@@ -40,18 +43,54 @@ namespace view {
                 connect(buttons[i][j], &MineButton::right_clicked, this, &MineWindow::on_mark);
                 connect(buttons[i][j], &MineButton::left_clicked, this, &MineWindow::on_reveal);
 
-                model::MineSquare curr_square = new_state.get_square({ i, j });
-                if (!curr_square.is_revealed) {
-                    QString btn_text = curr_square.is_marked ? "🚩" : "";
-                    buttons[i][j]->setDisabled(false);
-                    buttons[i][j]->setText(btn_text);
-                } else if (!curr_square.is_mine) {
-                    buttons[i][j]->setDisabled(true);
-                    buttons[i][j]->setText(QString::number(curr_square.adjacent_mines));
-                } else {
-                    buttons[i][j]->setDisabled(true);
-                    buttons[i][j]->setText("💣");
-                }
+                const model::MineSquare& curr_square = new_state.get_square({ i, j });
+                render_button(curr_square, buttons[i][j]);
+            }
+        }
+    }
+
+    void MineWindow::render_button(const model::MineSquare& s, MineButton* button) {
+        const QIcon flag(":/assets/ms-flag.png");
+        const QIcon mine(":/assets/ms-mine.png");
+        const QIcon none;
+
+        // From https://stackoverflow.com/questions/30973781/qt-add-custom-font-from-resource
+        int id = QFontDatabase::addApplicationFont(":/assets/ms-numbers.ttf");
+        QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+        button->setFont(QFont(family, 16));
+        button->setIconSize(QSize(27, 27));
+
+        const bool is_reveal = s.is_revealed;
+        const bool is_mark = s.is_marked;
+        const bool is_adj = s.adjacent_mines;
+        const bool is_mine = s.is_mine;
+        const bool is_end = s.is_reason_for_end;
+
+        if (!is_reveal) {
+            button->setText("");
+            button->setIcon(is_mark ? flag : none);
+            button->setDisabled(false);
+        } else {
+            if (is_mine) {
+                button->setObjectName(is_end ? "red" : ""); // For stylesheet
+                button->setText("!");
+                button->setIcon(none);
+                button->setDisabled(true);
+            } else if (is_adj) {
+                // The font pack is messed up; The 74th character in the ascii table (which is
+                // supposed to be an uppercase J) is the start of the numbers 0-9. Therefore,
+                // we add s.adjacent_mines to 74 to convert it into the appropriate ascii
+                // code.
+                char16_t c[2] = { (char16_t) (74 + s.adjacent_mines), '\0' };
+                QString temp = QString::fromUtf16(c);
+                button->setObjectName(QString::number(s.adjacent_mines) + "m"); // For stylesheet
+                button->setText(temp);
+                button->setIcon(none);
+                button->setDisabled(true);
+            } else {
+                button->setText("");
+                button->setIcon(none);
+                button->setDisabled(true);
             }
         }
     }
