@@ -26,21 +26,27 @@ qt_add_executable(minesweeper
     src/main.cpp
     src/app/app.cpp
     src/view/button.cpp
-    src/view/game.cpp
-    src/view/game.ui
+    src/view/window.cpp
+    src/view/window.ui
     src/model/data.cpp
 )
 
 qt_add_resources(minesweeper "assets"
     PREFIX "/"
     FILES
-        assets/ms-dead.png
-        assets/ms-win.png
-        assets/ms-smile.png
-        assets/ms-flag.png
-        assets/ms-cross.png
-        assets/ms-mine.png
-        assets/ms-numbers.ttf
+        assets/board/dead.png
+        assets/board/win.png
+        assets/board/smile.png
+
+        assets/board/flag.png
+        assets/board/cross.png
+        assets/board/mine.png
+        assets/board/font.ttf
+
+        assets/window/close.png
+        assets/window/minimize.png
+        assets/window/font.otf
+        
 )
 
 # Target configuration

@@ -4,6 +4,7 @@
 
 #include "QPushButton"
 #include "QMouseEvent"
+#include "QPoint"
 #include "QWidget"
 
 namespace view {
