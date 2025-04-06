@@ -36,6 +36,7 @@ qt_add_resources(Minesweeper "assets"
     FILES
         assets/board/dead.png
         assets/board/win.png
+        assets/board/revealing.png
         assets/board/smile.png
 
         assets/board/flag.png
