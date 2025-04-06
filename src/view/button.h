@@ -17,15 +17,15 @@ public:
     MineButton(const model::MineCoord& coord, QWidget* parent = nullptr);
 
 private slots:
-    // This slot catches the signal emitted by the base class when the button is
-    // clicked. It then emits a new clicked signal with the id of the button as its
-    // parameter. (QWidget/QPushButton mouse press event override)
+    void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
 
 signals:
+    void enable_surprise_face() const;
+    void disable_surprise_face() const;
     // Signal for when the button is clicked (has id as parameter)
-    void left_clicked(const model::MineCoord& id) const;
-    void right_clicked(const model::MineCoord& id) const;
+    void lmb_released(const model::MineCoord& id) const;
+    void rmb_released(const model::MineCoord& id) const;
 
 private:
     model::MineCoord m_coord;

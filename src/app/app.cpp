@@ -55,7 +55,7 @@ void App::on_restart() {
     m_game_won = false;
 
     m_board = model::MineBoard(9, 9);
-    m_window->render_board(m_board, m_game_over, m_game_won);
+    m_window->update_window(m_board, { m_game_won, m_game_over, false });
 }
 
 void App::on_mark(const model::MineCoord& coord) {
@@ -68,7 +68,7 @@ void App::on_mark(const model::MineCoord& coord) {
     
     model::MineSquare& square = m_board.get_square(coord);
     square.is_marked = !square.is_marked;
-    m_window->render_board(m_board, m_game_over, m_game_won);
+    m_window->update_window(m_board, { m_game_won, m_game_over, false });
 }
 
 void App::on_reveal(const model::MineCoord& coord) {
@@ -83,18 +83,18 @@ void App::on_reveal(const model::MineCoord& coord) {
     if (square.is_mine) {
         reveal_mines(coord);
         m_game_over = true;
-        m_window->render_board(m_board, m_game_over, m_game_won);
+        m_window->update_window(m_board, { m_game_won, m_game_over, false });
     } else if (square.adjacent_mines) {
         m_board.get_square(coord).is_revealed = true;
-        m_window->render_board(m_board, m_game_over, m_game_won);
+        m_window->update_window(m_board, { m_game_won, m_game_over, false });
     } else {
         m_board.floodfill(coord);
-        m_window->render_board(m_board, m_game_over, m_game_won);
+        m_window->update_window(m_board, { m_game_won, m_game_over, false });
     }
 
     if (m_board.did_win()) {
         m_game_won = true;
-        m_window->render_board(m_board, m_game_over, m_game_won);
+        m_window->update_window(m_board, { m_game_won, m_game_over, false });
     }
 }
 

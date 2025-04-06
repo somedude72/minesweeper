@@ -1,8 +1,18 @@
 #pragma once
 
 #include <vector>
+#include <cstdint>
 
 namespace model {
+
+struct GameSettings {
+    uint32_t row_size, col_size, num_mines;
+    bool is_safe_first_move;
+};
+
+struct GameState {
+    bool win, lose, revealing_mine;
+};
 
 struct MineCoord {
     int32_t row, col;
