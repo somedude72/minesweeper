@@ -35,6 +35,9 @@ MineWindow::MineWindow(const model::MineBoard& init_state, QWidget* parent) : QM
     window_title->setFont(QFont(family, 18));
     window_title->setText("Minesweeper");
 
+    menu_game->setFont(QFont(family, 15, 800));
+    menu_help->setFont(QFont(family, 15, 800));
+
     connect(window_close, &QPushButton::clicked, this, &MineWindow::on_close);
     connect(window_min, &QPushButton::clicked, this, &MineWindow::on_minimize);
     connect(ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::on_restart);
