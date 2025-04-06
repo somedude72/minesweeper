@@ -124,6 +124,8 @@ MineButton::MineButton(const model::MineCoord& coord, QWidget* parent) : QPushBu
 }
 
 void MineButton::mouseReleaseEvent(QMouseEvent* event) {
+    if (!rect().contains(event->pos()))
+        return;
     if (event->button() == Qt::RightButton)
         emit right_clicked(m_coord);
     if (event->button() == Qt::LeftButton)
