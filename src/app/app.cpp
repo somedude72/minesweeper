@@ -9,7 +9,7 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
     SET_LOG_PRIORITY(DEBUG_LEVEL);
     SET_LOG_PATTERN("[%a, %b %d %H:%M:%S] [%l] %v");
     LOG_INFO("app: logging initiated (this is a test message)");
-    
+
     m_game_over = false;
     m_game_won = false;
 
