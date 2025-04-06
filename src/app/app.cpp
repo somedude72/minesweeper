@@ -20,7 +20,9 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
     connect(m_window, &view::MineWindow::restart, this, &App::on_restart);
     connect(m_window, &view::MineWindow::reveal, this, &App::on_reveal);
     connect(m_window, &view::MineWindow::mark, this, &App::on_mark);
+
     connect(m_window, &view::MineWindow::close, this, &App::on_close);
+    connect(m_window, &view::MineWindow::minimize, this, &App::on_minimize);
 
     m_window->show();
 }
@@ -96,6 +98,10 @@ void App::on_reveal(const model::MineCoord& coord) {
     }
 }
 
+void App::on_minimize() {
+    m_window->setWindowState(Qt::WindowMinimized);
+}
+
 void App::on_close() {
-    this->exit();
+    this->exit(0);
 }

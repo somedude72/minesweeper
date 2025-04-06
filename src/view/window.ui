@@ -80,7 +80,7 @@ QPushButton#ctrl_button_restart:pressed {
     color: rgb(0, 0, 0);
 }
 
-QWidget#window {
+QWidget#window_bar {
     margin: 4px 6px 0px 6px;
     background-color: rgb(0, 0, 148);
 }
@@ -105,8 +105,34 @@ QPushButton#window_close:pressed {
     color: rgb(0, 0, 0);
 }
 
+QPushButton#window_min {
+    border: 0px solid gray;
+    border-right: 2px solid gray;
+	border-bottom: 2px solid gray;
+	border-top: 2px solid white;
+	border-left: 2px solid white;
+    background-color: rgb(205, 205, 205);
+    color: rgb(0, 0, 0);
+}
+        
+QPushButton#window_min:pressed {
+	border: 0px solid gray;
+    border-right: 2px solid white;
+	border-bottom: 2px solid white;
+	border-top: 2px solid gray;
+	border-left: 2px solid gray;
+    background-color: rgb(205, 205, 205);
+    color: rgb(0, 0, 0);
+}
+
+.QToolButton {
+    margin-top: 2px;
+    border: 0px solid black;
+    color: black;
+}
+
 QLabel#window_title {
-    margin: 2px 0px 0px 2px;
+    margin: 0px 0px 2px 2px;
     color: rgb(255, 255, 255);
 }</string>
    </property>
@@ -131,7 +157,7 @@ QLabel#window_title {
       <property name="styleSheet">
        <string notr="true"/>
       </property>
-      <layout class="QGridLayout" name="root_grid_layout" rowstretch="0,0,0">
+      <layout class="QGridLayout" name="root_grid_layout" rowstretch="0,0,0,0">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -147,7 +173,143 @@ QLabel#window_title {
        <property name="spacing">
         <number>0</number>
        </property>
-       <item row="1" column="0">
+       <item row="0" column="0">
+        <widget class="QWidget" name="window_bar" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <property name="leftMargin">
+           <number>6</number>
+          </property>
+          <property name="topMargin">
+           <number>8</number>
+          </property>
+          <property name="rightMargin">
+           <number>12</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="3">
+           <widget class="QPushButton" name="window_close">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>23</width>
+              <height>23</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>23</width>
+              <height>23</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <spacer name="window_spacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Policy::MinimumExpanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="window_title">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>26</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::TextFormat::PlainText</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="window_min">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>23</width>
+              <height>23</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>23</width>
+              <height>23</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QWidget" name="board_widget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font/>
+         </property>
+         <layout class="QGridLayout" name="board_widget_layout">
+          <property name="leftMargin">
+           <number>15</number>
+          </property>
+          <property name="topMargin">
+           <number>8</number>
+          </property>
+          <property name="rightMargin">
+           <number>15</number>
+          </property>
+          <property name="bottomMargin">
+           <number>24</number>
+          </property>
+          <property name="horizontalSpacing">
+           <number>-1</number>
+          </property>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0">
         <widget class="QWidget" name="control_widget" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -167,7 +329,7 @@ QLabel#window_title {
            <height>75</height>
           </size>
          </property>
-         <layout class="QGridLayout" name="control_widget_layout" columnstretch="0,1,0,1">
+         <layout class="QGridLayout" name="control_widget_layout" columnstretch="0,0,0,0">
           <property name="sizeConstraint">
            <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
           </property>
@@ -183,6 +345,22 @@ QLabel#window_title {
           <property name="bottomMargin">
            <number>0</number>
           </property>
+          <item row="0" column="3">
+           <spacer name="ctrl_spacer_right">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Policy::Preferred</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
           <item row="0" column="2">
            <widget class="QPushButton" name="ctrl_button_restart">
             <property name="sizePolicy">
@@ -221,124 +399,54 @@ QLabel#window_title {
             </property>
            </spacer>
           </item>
-          <item row="0" column="3">
-           <spacer name="ctrl_spacer_right">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Policy::Preferred</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
          </layout>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QWidget" name="board_widget" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font/>
-         </property>
-         <layout class="QGridLayout" name="board_widget_layout">
+       <item row="1" column="0">
+        <widget class="QWidget" name="menu_bar" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <property name="leftMargin">
-           <number>15</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
-           <number>8</number>
-          </property>
-          <property name="rightMargin">
-           <number>15</number>
-          </property>
-          <property name="bottomMargin">
-           <number>24</number>
-          </property>
-          <property name="horizontalSpacing">
-           <number>-1</number>
-          </property>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QWidget" name="window" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>34</height>
-          </size>
-         </property>
-         <layout class="QGridLayout" name="gridLayout">
-          <property name="leftMargin">
-           <number>8</number>
-          </property>
-          <property name="topMargin">
-           <number>8</number>
-          </property>
-          <property name="rightMargin">
-           <number>9</number>
+           <number>6</number>
           </property>
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="0" column="2" rowspan="2" colspan="2">
-           <widget class="QPushButton" name="window_close">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>23</width>
-              <height>23</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>23</width>
-              <height>23</height>
-             </size>
+          <item>
+           <widget class="QToolButton" name="menu_game">
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+              <bold>true</bold>
+             </font>
             </property>
             <property name="text">
-             <string/>
+             <string>Game</string>
+            </property>
+            <property name="popupMode">
+             <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="window_title">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>26</height>
-             </size>
+          <item>
+           <widget class="QToolButton" name="menu_help">
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+              <bold>true</bold>
+             </font>
             </property>
             <property name="text">
-             <string/>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::TextFormat::PlainText</enum>
+             <string>Help</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <spacer name="window_spacer">
+          <item>
+           <spacer name="menu_spacer_right">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Policy::MinimumExpanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -356,31 +464,6 @@ QLabel#window_title {
     </item>
    </layout>
   </widget>
-  <action name="file_about">
-   <property name="text">
-    <string>About</string>
-   </property>
-  </action>
-  <action name="file_save">
-   <property name="text">
-    <string>Save</string>
-   </property>
-  </action>
-  <action name="file_save_as">
-   <property name="text">
-    <string>Save as...</string>
-   </property>
-  </action>
-  <action name="file_open">
-   <property name="text">
-    <string>Open</string>
-   </property>
-  </action>
-  <action name="file_options">
-   <property name="text">
-    <string>Preferences</string>
-   </property>
-  </action>
  </widget>
  <resources/>
  <connections/>

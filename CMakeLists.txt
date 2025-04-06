@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21.1 FATAL_ERROR)
-project(minesweeper LANGUAGES CXX)
+project(Minesweeper LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
@@ -22,7 +22,7 @@ else()
 endif()
 
 # Minesweeper target
-qt_add_executable(minesweeper
+qt_add_executable(Minesweeper
     src/main.cpp
     src/app/app.cpp
     src/view/button.cpp
@@ -31,7 +31,7 @@ qt_add_executable(minesweeper
     src/model/data.cpp
 )
 
-qt_add_resources(minesweeper "assets"
+qt_add_resources(Minesweeper "assets"
     PREFIX "/"
     FILES
         assets/board/dead.png
@@ -50,12 +50,13 @@ qt_add_resources(minesweeper "assets"
 )
 
 # Target configuration
-target_include_directories(minesweeper PRIVATE src)
-target_link_libraries(minesweeper PRIVATE ${LIBRARIES})
+target_include_directories(Minesweeper PRIVATE src)
+target_link_libraries(Minesweeper PRIVATE ${LIBRARIES})
 
-set_target_properties(minesweeper PROPERTIES
+set_target_properties(Minesweeper PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
+    MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/assets/macos/Info.plist
 )
 
 set_source_files_properties(${ASSETS}

@@ -19,6 +19,7 @@ private slots:
     void on_reveal(const model::MineCoord& coord);
 
     void on_close();
+    void on_minimize();
 
 private:
     model::MineBoard m_board;
