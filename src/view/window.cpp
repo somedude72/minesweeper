@@ -4,6 +4,8 @@
 
 #include "QString"
 #include "QPoint"
+#include "QMouseEvent"
+
 #include "QFontDatabase"
 #include "QIcon"
 #include "QPixmap"
@@ -28,10 +30,13 @@ MineWindow::MineWindow(const model::MineBoard& init_state, QWidget* parent) : QM
 
     window_close->setIcon(QIcon(":/assets/window/close.png"));
     window_close->setIconSize(QSize(15, 15));
+    window_min->setIcon(QIcon(":/assets/window/minimize.png"));
+    window_min->setIconSize(QSize(15, 15));
     window_title->setFont(QFont(family, 18));
     window_title->setText("Minesweeper");
 
     connect(window_close, &QPushButton::clicked, this, &MineWindow::on_close);
+    connect(window_min, &QPushButton::clicked, this, &MineWindow::on_minimize);
     connect(ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::on_restart);
     render_board(init_state, false, false);
 }
@@ -137,6 +142,32 @@ void MineWindow::on_mark(const model::MineCoord& coord) const {
 
 void MineWindow::on_close() const {
     emit close();
+}
+
+void MineWindow::on_minimize() const {
+    emit minimize();
+}
+
+/********** Custom Title Bar Implementation **********/
+
+void MineWindow::mousePressEvent(QMouseEvent* event) {
+    QWidget* child = childAt(event->position());
+    if (window_bar == child || window_title == child) {
+        m_prev_position = event->globalPosition();
+    }
+}
+
+void MineWindow::mouseMoveEvent(QMouseEvent* event) {
+    QWidget* child = childAt(event->position());
+    if (m_prev_position != QPointF(-1, -1)) {
+        const QPointF delta = event->globalPosition() - m_prev_position;
+        move(x() + delta.x(), y() + delta.y());
+        m_prev_position = event->globalPosition();
+    }
+}
+
+void MineWindow::mouseReleaseEvent(QMouseEvent* event) {
+    m_prev_position = QPointF(-1, -1);
 }
 
 } // namespace view
