@@ -413,12 +413,6 @@ QLabel#window_title {
           </property>
           <item>
            <widget class="QToolButton" name="menu_game">
-            <property name="font">
-             <font>
-              <pointsize>15</pointsize>
-              <bold>true</bold>
-             </font>
-            </property>
             <property name="text">
              <string>Game</string>
             </property>
