@@ -123,13 +123,24 @@ MineButton::MineButton(const model::MineCoord& coord, QWidget* parent) : QPushBu
     m_coord = coord;
 }
 
+void MineButton::mousePressEvent(QMouseEvent* event) {
+    if (event->button() == Qt::LeftButton)
+        emit enable_surprise_face();
+    QPushButton::mousePressEvent(event);
+}
+
 void MineButton::mouseReleaseEvent(QMouseEvent* event) {
+    emit disable_surprise_face();
+
     if (!rect().contains(event->pos()))
         return;
     if (event->button() == Qt::RightButton)
-        emit right_clicked(m_coord);
-    if (event->button() == Qt::LeftButton)
-        emit left_clicked(m_coord);
+        emit rmb_released(m_coord);
+    if (event->button() == Qt::LeftButton) {
+        emit lmb_released(m_coord);
+    }
+
+    QPushButton::mouseReleaseEvent(event);
 }
 
 } // namespace view
