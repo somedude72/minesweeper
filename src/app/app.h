@@ -2,7 +2,7 @@
 
 #include "QApplication"
 
-#include "view/game.h"
+#include "view/window.h"
 #include "model/data.h"
 
 class App : public QApplication {
@@ -17,6 +17,8 @@ private slots:
     void on_restart();
     void on_mark(const model::MineCoord& coord);
     void on_reveal(const model::MineCoord& coord);
+
+    void on_close();
 
 private:
     model::MineBoard m_board;
