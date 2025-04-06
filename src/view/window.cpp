@@ -1,8 +1,9 @@
-#include "view/game.h"
+#include "view/window.h"
 #include "view/button.h"
 #include "utils/config.h"
 
 #include "QString"
+#include "QPoint"
 #include "QFontDatabase"
 #include "QIcon"
 #include "QPixmap"
@@ -21,8 +22,16 @@ MineWindow::MineWindow(const model::MineBoard& init_state, QWidget* parent) : QM
     board_widget_layout->setVerticalSpacing(12);
     board_widget_layout->setHorizontalSpacing(0);
 
-    ctrl_button_restart->setIconSize(QSize(27, 27));
-    
+    // From https://stackoverflow.com/questions/30973781/qt-add-custom-font-from-resource
+    int id = QFontDatabase::addApplicationFont(":/assets/window/font.otf");
+    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+
+    window_close->setIcon(QIcon(":/assets/window/close.png"));
+    window_close->setIconSize(QSize(15, 15));
+    window_title->setFont(QFont(family, 18));
+    window_title->setText("Minesweeper");
+
+    connect(window_close, &QPushButton::clicked, this, &MineWindow::on_close);
     connect(ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::on_restart);
     render_board(init_state, false, false);
 }
@@ -32,43 +41,44 @@ void MineWindow::render_board(const model::MineBoard& new_state, bool lose, bool
     clear_board();
     int32_t row_size = new_state.row_size();
     int32_t col_size = new_state.col_size();
+    ctrl_button_restart->setIconSize(QSize(27, 27));
 
     if (win) {
-        ctrl_button_restart->setIcon(QIcon(":/assets/ms-win.png"));
+        ctrl_button_restart->setIcon(QIcon(":/assets/board/win.png"));
     } else if (lose) {
-        ctrl_button_restart->setIcon(QIcon(":/assets/ms-dead.png"));
+        ctrl_button_restart->setIcon(QIcon(":/assets/board/dead.png"));
     } else {
-        ctrl_button_restart->setIcon(QIcon(":/assets/ms-smile.png"));
+        ctrl_button_restart->setIcon(QIcon(":/assets/board/smile.png"));
     }
     
-    buttons.resize(row_size, std::vector<MineButton*>(col_size, nullptr));
+    m_buttons.resize(row_size, std::vector<MineButton*>(col_size, nullptr));
     for (int32_t i = 0; i < row_size; i++) {
         for (int32_t j = 0; j < col_size; j++) {
-            buttons[i][j] = new MineButton({ i, j }, this);
-            buttons[i][j]->setFixedSize(30, 30);
-            buttons[i][j]->setContentsMargins(0, 0, 0, 0);
-            connect(buttons[i][j], &MineButton::right_clicked, this, &MineWindow::on_mark);
-            connect(buttons[i][j], &MineButton::left_clicked, this, &MineWindow::on_reveal);
-            board_widget_layout->addWidget(buttons[i][j], i, j);
+            m_buttons[i][j] = new MineButton({ i, j }, this);
+            m_buttons[i][j]->setFixedSize(30, 30);
+            m_buttons[i][j]->setContentsMargins(0, 0, 0, 0);
+            connect(m_buttons[i][j], &MineButton::right_clicked, this, &MineWindow::on_mark);
+            connect(m_buttons[i][j], &MineButton::left_clicked, this, &MineWindow::on_reveal);
+            board_widget_layout->addWidget(m_buttons[i][j], i, j);
 
-            render_button(new_state.get_square({ i, j }), buttons[i][j], lose, win);
+            render_button(new_state.get_square({ i, j }), m_buttons[i][j], lose, win);
         }
     }
 }
 
 void MineWindow::render_button(const model::MineSquare& s, MineButton* button, bool lose, bool win) {
     QIcon flag, mine, marked_mine, none;
-    flag.addPixmap(QPixmap(":/assets/ms-flag.png"), QIcon::Disabled);
-    flag.addPixmap(QPixmap(":/assets/ms-flag.png"), QIcon::Normal);
-    mine.addPixmap(QPixmap(":/assets/ms-mine.png"), QIcon::Disabled);
-    mine.addPixmap(QPixmap(":/assets/ms-mine.png"), QIcon::Normal);
-    marked_mine.addPixmap(QPixmap(":/assets/ms-cross.png"), QIcon::Disabled);
-    marked_mine.addPixmap(QPixmap(":/assets/ms-cross.png"), QIcon::Normal);
-
+    flag.addPixmap(QPixmap(":/assets/board/flag.png"), QIcon::Disabled);
+    flag.addPixmap(QPixmap(":/assets/board/flag.png"), QIcon::Normal);
+    mine.addPixmap(QPixmap(":/assets/board/mine.png"), QIcon::Disabled);
+    mine.addPixmap(QPixmap(":/assets/board/mine.png"), QIcon::Normal);
+    marked_mine.addPixmap(QPixmap(":/assets/board/cross.png"), QIcon::Disabled);
+    marked_mine.addPixmap(QPixmap(":/assets/board/cross.png"), QIcon::Normal);
 
     // From https://stackoverflow.com/questions/30973781/qt-add-custom-font-from-resource
-    int id = QFontDatabase::addApplicationFont(":/assets/ms-numbers.ttf");
+    int id = QFontDatabase::addApplicationFont(":/assets/board/font.ttf");
     QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+
     button->setFont(QFont(family, 16));
     button->setIconSize(QSize(27, 27));
 
@@ -104,11 +114,11 @@ void MineWindow::render_button(const model::MineSquare& s, MineButton* button, b
 }
 
 void MineWindow::clear_board() {
-    for (int32_t i = 0; i < buttons.size(); i++) {
-        for (int32_t j = 0; j < buttons[0].size(); j++) {
-            board_widget_layout->removeWidget(buttons[i][j]);
-            buttons[i][j]->deleteLater();
-            buttons[i][j] = nullptr;
+    for (int32_t i = 0; i < m_buttons.size(); i++) {
+        for (int32_t j = 0; j < m_buttons[0].size(); j++) {
+            board_widget_layout->removeWidget(m_buttons[i][j]);
+            m_buttons[i][j]->deleteLater();
+            m_buttons[i][j] = nullptr;
         }
     }
 }
@@ -123,6 +133,10 @@ void MineWindow::on_reveal(const model::MineCoord& coord) const {
 
 void MineWindow::on_mark(const model::MineCoord& coord) const {
     emit mark(coord);
+}
+
+void MineWindow::on_close() const {
+    emit close();
 }
 
 } // namespace view

@@ -1,7 +1,7 @@
 #include "QApplication"
 
 #include "app/app.h"
-#include "view/game.h"
+#include "view/window.h"
 #include "model/data.h"
 #include "utils/config.h"
 
@@ -20,6 +20,7 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
     connect(m_window, &view::MineWindow::restart, this, &App::on_restart);
     connect(m_window, &view::MineWindow::reveal, this, &App::on_reveal);
     connect(m_window, &view::MineWindow::mark, this, &App::on_mark);
+    connect(m_window, &view::MineWindow::close, this, &App::on_close);
 
     m_window->show();
 }
@@ -78,23 +79,23 @@ void App::on_reveal(const model::MineCoord& coord) {
     model::MineSquare& square = m_board.get_square(coord);
 
     if (square.is_mine) {
-        LOG_INFO("app: game over due to revealing mine");
         reveal_mines(coord);
         m_game_over = true;
         m_window->render_board(m_board, m_game_over, m_game_won);
     } else if (square.adjacent_mines) {
-        LOG_DEBUG("app: revealed an adjacent mine square (non floodfill)");
         m_board.get_square(coord).is_revealed = true;
         m_window->render_board(m_board, m_game_over, m_game_won);
     } else {
-        LOG_DEBUG("app: revealed a non-adjacent mine square (floodfill)");
         m_board.floodfill(coord);
         m_window->render_board(m_board, m_game_over, m_game_won);
     }
 
     if (m_board.did_win()) {
-        LOG_INFO("app: game won due to revealing all non mines");
         m_game_won = true;
         m_window->render_board(m_board, m_game_over, m_game_won);
     }
+}
+
+void App::on_close() {
+    this->exit();
 }
