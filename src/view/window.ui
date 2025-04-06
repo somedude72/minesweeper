@@ -304,7 +304,10 @@ QLabel#window_title {
            <number>24</number>
           </property>
           <property name="horizontalSpacing">
-           <number>-1</number>
+           <number>0</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>12</number>
           </property>
          </layout>
         </widget>
