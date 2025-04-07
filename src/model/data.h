@@ -12,6 +12,16 @@ struct GameSettings {
 
 struct GameState {
     bool win, lose, revealing_mine;
+
+    inline bool operator==(const GameState& other) const {
+        return this->win == other.win &&
+            this->lose == other.lose &&
+            this->revealing_mine == other.revealing_mine;
+    }
+
+    inline bool operator!=(const GameState& other) const {
+        return !(*this == other);
+    }
 };
 
 struct MineCoord {
@@ -22,12 +32,25 @@ struct MineSquare {
     int adjacent_mines = 0;
     bool is_mine = false, is_marked = false;
     bool is_revealed = false, is_end_reason = false;
+
+    inline bool operator==(const MineSquare& other) const {
+        return this->adjacent_mines == other.adjacent_mines &&
+            this->is_mine == other.is_mine &&
+            this->is_marked == other.is_marked &&
+            this->is_revealed == other.is_revealed &&
+            this->is_end_reason == other.is_end_reason;
+    }
+
+    inline bool operator!=(const MineSquare& other) const {
+        return !(*this == other);
+    }
 };
 
 class MineBoard {
 public:
 
     MineBoard() = default;
+    MineBoard(const MineBoard& other) = default;
 
     // Construct a new MineBoard object with row number of rows and col number of
     // columns; also procedurally generating the mines.
@@ -41,10 +64,11 @@ public:
     const MineSquare& get_square(const MineCoord& get_coord) const;
     MineSquare& get_square(const MineCoord& get_coord);
 
+    bool reveal_adjacent(const MineCoord& coord);
+    bool did_win() const;
+    
     int32_t row_size() const;
     int32_t col_size() const;
-
-    bool did_win() const;
 
 private:
     void generate_mines(); 

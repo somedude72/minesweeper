@@ -67,49 +67,49 @@ QPushButton#red_background:disabled {
 }
 
 /* Buttons with numbers */
-QPushButton#mine_1:disabled {
+QPushButton#mine_1 {
     border: 1px solid gray;
     background-color: rgb(205, 205, 205);
     color: rgb(32, 32, 245);
 }
 
-QPushButton#mine_2:disabled {
+QPushButton#mine_2 {
     border: 1px solid gray;
     background-color: rgb(205, 205, 205);
     color: rgb(0, 128, 0);
 }
 
-QPushButton#mine_3:disabled {
+QPushButton#mine_3 {
     border: 1px solid gray;
     background-color: rgb(205, 205, 205);
     color: rgb(255, 0, 0);
 }
 
-QPushButton#mine_4:disabled {
+QPushButton#mine_4 {
     border: 1px solid gray;
     background-color: rgb(205, 205, 205);
     color: rgb(0, 0, 128);
 }
 
-QPushButton#mine_5:disabled {
+QPushButton#mine_5 {
     border: 1px solid gray;
     background-color: rgb(205, 205, 205);
     color: rgb(128, 0, 0);
 }
 
-QPushButton#mine_6:disabled {
+QPushButton#mine_6 {
     border: 1px solid gray;
     background-color: rgb(205, 205, 205);
     color: rgb(0, 128, 128);
 }
 
-QPushButton#mine_7:disabled {
+QPushButton#mine_7 {
     border: 1px solid gray;
     background-color: rgb(205, 205, 205);
     color: rgb(0, 0, 0);
 }
 
-QPushButton#mine_8:disabled {
+QPushButton#mine_8 {
     border: 1px solid gray;
     background-color: rgb(205, 205, 205);
     color: rgb(128, 128, 128);

@@ -38,24 +38,57 @@ void MineBoard::floodfill(const MineCoord& start) {
         MineCoord curr = queue.front();
         m_board[curr.row][curr.col].is_revealed = true;
         queue.pop();
-        const int dir_row[4] = { 0, 0, -1, 1 };
-        const int dir_col[4] = { -1, 1, 0, 0 }; 
+        const int dir_row[8] = { -1, -1, -1, 0, 0, 1, 1, 1 };
+        const int dir_col[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
 
-        for (int32_t i = 0; i < 4; i++) {
+        if (m_board[curr.row][curr.col].adjacent_mines)
+            continue;
+        for (int32_t i = 0; i < 8; i++) {
             int32_t new_row = curr.row + dir_row[i];
             int32_t new_col = curr.col + dir_col[i];
             if (new_row < 0 || new_col < 0 || new_row >= row_size() || new_col >= col_size())
                 continue;
             if (m_board[new_row][new_col].is_mine || m_board[new_row][new_col].is_revealed)
                 continue;
-            if (m_board[new_row][new_col].adjacent_mines) {
-                m_board[new_row][new_col].is_revealed = true;
-            } else {
-                m_board[new_row][new_col].is_revealed = true;
-                queue.push({ new_row, new_col });
-            }
+            m_board[new_row][new_col].is_revealed = true;
+            queue.push({ new_row, new_col });
         }
     }
+}
+
+bool MineBoard::reveal_adjacent(const MineCoord& coord) {
+    int flag_nums = 0;
+    const int dir_row[8] = { -1, -1, -1, 0, 0, 1, 1, 1 };
+    const int dir_col[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
+    for (int i = 0; i < 8; i++) {
+        int new_row = coord.row + dir_row[i];
+        int new_col = coord.col + dir_col[i];
+        if (new_row < 0 || new_col < 0 || new_row >= row_size() || new_col >= col_size())
+            continue;
+        if (m_board[new_row][new_col].is_marked) {
+            flag_nums++;
+        }
+    }
+
+
+    if (flag_nums != m_board[coord.row][coord.col].adjacent_mines)
+        return false;
+
+    bool is_mine = false;
+    for (int i = 0; i < 8; i++) {
+        int new_row = coord.row + dir_row[i];
+        int new_col = coord.col + dir_col[i];
+        if (new_row < 0 || new_col < 0 || new_row >= row_size() || new_col >= col_size() || m_board[new_row][new_col].is_marked)
+            continue;
+        if (m_board[new_row][new_col].is_mine) {
+            m_board[new_row][new_col].is_end_reason = true;
+            is_mine = true;
+        }
+
+        m_board[new_row][new_col].is_revealed = true;
+    }
+    
+    return is_mine;
 }
 
 const MineSquare& MineBoard::get_square(const MineCoord& get_coord) const {
