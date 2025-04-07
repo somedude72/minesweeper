@@ -18,7 +18,7 @@ public:
     // Constructs a game window with an initial state. The state will be pushed into a
     // QGridLayout, with the mine board buttons generated dynamically
     MineWindow(const model::MineBoard& init_board, QWidget* parent = nullptr);
-    void update_window(const model::MineBoard& new_board, const model::GameState& new_state);
+    void update_window(const model::MineBoard& new_board, const model::GameState& new_state, bool first_render = false);
 
 protected:
     // Qt custom title bar movement mouse events
@@ -48,22 +48,24 @@ signals:
     void minimize() const;
 
 private:
-    void clear_board();
-    void update_icon();
-    void render_button(const model::MineSquare& square, MineButton* button_view);
+    void update_control_icon(const model::GameState& state);
+    void render_button(const model::MineSquare& square, const model::GameState& state, MineButton* button_view);
 
 private:
-    model::GameState m_state;
+    model::GameState m_prev_state;
+    model::MineBoard m_prev_board;
 
     // We do not need to manually deallocate the buttons because the QMainWindow class
     // does it for us. Each parent is assigned this as its parent, and when parents
     // are destroyed, Qt automatically calls the destructor on each of its children.
     std::vector<std::vector<MineButton*>> m_buttons;
 
+private:
     // Custom title bar implementation partially taken from
     // https://stackoverflow.com/questions/11314429/select-moving-qwidget-in-the-screen
     QPointF m_prev_position;
     bool m_moving_window = false;
+    QIcon m_flag, m_mine, m_marked_mine, m_no_icon;
 
 };
 
