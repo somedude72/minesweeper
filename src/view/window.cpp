@@ -18,11 +18,9 @@ namespace view {
 
 MineWindow::MineWindow(const model::MineBoard& init_board, QWidget* parent) : QMainWindow(parent) {
     setupUi(this);
-    adjustSize();
     
     LOG_INFO("window: initializing main ui");
     LOG_INFO("window: fixed size is {}, {}", size().width(), size().height());
-    setMaximumSize(size().width(), size().height());
 
     // From https://stackoverflow.com/questions/30973781/qt-add-custom-font-from-resource
     int window_font_id = QFontDatabase::addApplicationFont(":/assets/window/font.otf");
@@ -86,7 +84,7 @@ void MineWindow::update_window(const model::MineBoard& new_board, const model::G
     
     m_prev_state = new_state;
     m_prev_board = new_board;
-    adjustSize();
+    // adjustSize();
 }
 
 void MineWindow::render_button(const model::MineSquare& square, const model::GameState& new_state, MineButton* button) {
