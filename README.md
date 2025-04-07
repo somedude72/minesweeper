@@ -49,5 +49,9 @@ the bundle.
 
 ## Notes
 
-Note that this project is currently still in heavy development, and some aspects may not
-be polished or be extremely buggy. 
+Note that this project is currently still in heavy development, and some aspects may be
+non-functional or buggy. 
+
+Please also note that there is a (known) issue that the performance might be poor when
+revealing large number of squares. This is caused by Qt's stylesheet updates, which I
+have not found a fix yet. 
