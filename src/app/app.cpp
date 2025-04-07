@@ -13,7 +13,7 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
     m_game_over = false;
     m_game_won = false;
 
-    m_board = model::MineBoard(9, 9);
+    m_board = model::MineBoard(30, 50);
     m_window = new view::MineWindow(m_board);
     m_window->setWindowFlags(Qt::FramelessWindowHint);
 
@@ -23,7 +23,6 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
 
     connect(m_window, &view::MineWindow::close, this, &App::on_close);
     connect(m_window, &view::MineWindow::minimize, this, &App::on_minimize);
-
     m_window->show();
 }
 
@@ -50,11 +49,9 @@ void App::reveal_mines(const model::MineCoord& last_reveal) {
 
 void App::on_restart() {
     LOG_INFO("app: received restart game signal");
-
     m_game_over = false;
     m_game_won = false;
-
-    m_board = model::MineBoard(9, 9);
+    m_board = model::MineBoard(30, 50);
     m_window->update_window(m_board, { m_game_won, m_game_over, false });
 }
 
@@ -65,7 +62,6 @@ void App::on_mark(const model::MineCoord& coord) {
     }
 
     LOG_INFO("app: received mark signal at ({}, {})", coord.row, coord.col);
-    
     model::MineSquare& square = m_board.get_square(coord);
     square.is_marked = !square.is_marked;
     m_window->update_window(m_board, { m_game_won, m_game_over, false });
@@ -84,12 +80,13 @@ void App::on_reveal(const model::MineCoord& coord) {
         reveal_mines(coord);
         m_game_over = true;
         m_window->update_window(m_board, { m_game_won, m_game_over, false });
-    } else if (square.adjacent_mines) {
-        m_board.get_square(coord).is_revealed = true;
-        m_window->update_window(m_board, { m_game_won, m_game_over, false });
-    } else {
+    } else if (!square.is_revealed) {
         m_board.floodfill(coord);
         m_window->update_window(m_board, { m_game_won, m_game_over, false });
+    } else {
+        bool is_mine = m_board.reveal_adjacent(coord);
+        if (is_mine) reveal_mines(coord);
+        m_window->update_window(m_board, { m_game_won, is_mine, false });
     }
 
     if (m_board.did_win()) {
