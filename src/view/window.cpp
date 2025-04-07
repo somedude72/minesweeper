@@ -89,21 +89,28 @@ void MineWindow::update_window(const model::MineBoard& new_board, const model::G
     adjustSize();
 }
 
-void MineWindow::render_button(const model::MineSquare& square, const model::GameState& new_state, MineButton* button) {
+void MineWindow::render_button(
+        const model::MineSquare& square, 
+        const model::GameState& new_state, 
+        MineButton* button
+    ) {
     const bool square_revealed = square.is_revealed;
     const bool square_marked = square.is_marked;
     const bool square_has_adj = square.adjacent_mines;
     const bool square_is_mine = square.is_mine;
     const bool square_is_end_reason = square.is_end_reason;
 
+    QString prev_name = button->objectName();
+
     if (!square_revealed) {
-        button->setObjectName(new_state.lose || new_state.win || square_marked ? "unclickable" : "regular"); // For stylesheet
+        button->setObjectName("regular");
         button->setIcon(square_marked ? m_flag : m_no_icon);
         button->setText("");
         button->setDisabled(false);
-    } else { // Revealed square
+        button->set_clickable_ui(new_state.lose || new_state.win || square_marked ? false : true);
+    } else if (square_revealed) {
         if (square_is_mine) {
-            button->setObjectName(square_is_end_reason ? "red_background" : "unclickable"); // For stylesheet
+            button->setObjectName(square_is_end_reason ? "red_background" : "regular"); // For stylesheet
             button->setIcon(square_marked ? m_marked_mine : m_mine);
             button->setText("");
             button->setDisabled(true);
@@ -125,7 +132,8 @@ void MineWindow::render_button(const model::MineSquare& square, const model::Gam
         }
     }
 
-    button->style()->polish(button);
+    if (button->objectName() != prev_name)
+        button->style()->polish(button);
 }
 
 void MineWindow::on_restart() const {

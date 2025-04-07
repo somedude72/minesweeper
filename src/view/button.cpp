@@ -33,27 +33,6 @@ QPushButton#regular:disabled {
     color: rgb(0, 0, 0);
 }
 
-/* End game button styles (static) */
-QPushButton#unclickable {
-    border: 0px solid gray;
-    border-right: 4px solid gray;
-    border-bottom: 4px solid gray;
-    border-top: 4px solid white;
-    border-left: 4px solid white;
-    background-color: rgb(205, 205, 205);
-    color: rgb(0, 0, 0);
-}
-
-QPushButton#unclickable:pressed {
-    border: 0px solid gray;
-    border-right: 4px solid gray;
-    border-bottom: 4px solid gray;
-    border-top: 4px solid white;
-    border-left: 4px solid white;
-    background-color: rgb(205, 205, 205);
-    color: rgb(0, 0, 0);
-}
-
 QPushButton#unclickable:disabled {
     border: 1px solid gray;
     background-color: rgb(205, 205, 205);
@@ -120,13 +99,19 @@ namespace view {
 
 MineButton::MineButton(const model::MineCoord& coord, QWidget* parent) : QPushButton(parent) {
     setStyleSheet(button_style);
+    m_clickable = true;
     m_coord = coord;
+}
+
+void MineButton::set_clickable_ui(bool clickable) {
+    m_clickable = clickable;
 }
 
 void MineButton::mousePressEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton)
         emit enable_surprise_face();
-    QPushButton::mousePressEvent(event);
+    if (m_clickable)
+        QPushButton::mousePressEvent(event);
 }
 
 void MineButton::mouseReleaseEvent(QMouseEvent* event) {
@@ -140,7 +125,8 @@ void MineButton::mouseReleaseEvent(QMouseEvent* event) {
         emit lmb_released(m_coord);
     }
 
-    QPushButton::mouseReleaseEvent(event);
+    if (m_clickable)
+        QPushButton::mouseReleaseEvent(event);
 }
 
 } // namespace view

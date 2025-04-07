@@ -15,6 +15,7 @@ class MineButton : public QPushButton {
     Q_OBJECT
 public:
     MineButton(const model::MineCoord& coord, QWidget* parent = nullptr);
+    void set_clickable_ui(bool clickable);
 
 private slots:
     void mousePressEvent(QMouseEvent* event) override;
@@ -28,6 +29,7 @@ signals:
     void rmb_released(const model::MineCoord& id) const;
 
 private:
+    bool m_clickable;
     model::MineCoord m_coord;
 
 };
