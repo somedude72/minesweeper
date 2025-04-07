@@ -53,5 +53,6 @@ Note that this project is currently still in heavy development, and some aspects
 non-functional or buggy. 
 
 Please also note that there is a (known) issue that the performance might be poor when
-revealing large number of squares. This is caused by Qt's stylesheet updates, which I
-have not found a fix yet. 
+when revealing a large number of squares. This issue originates with Qt's slow stylesheet
+updates and is not easily fixable by me. However, I have done my best to limit the
+stylesheet refreshes such that the lag should be barely noticeable. 
