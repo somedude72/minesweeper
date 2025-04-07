@@ -181,7 +181,7 @@ void MineWindow::update_control_icon(const model::GameState& state) {
 /********** Custom Title Bar Implementation **********/
 
 void MineWindow::mousePressEvent(QMouseEvent* event) {
-    QWidget* child = childAt(event->position());
+    QWidget* child = childAt(event->position().toPoint());
     if (window_bar == child || window_title == child) {
         m_prev_position = event->globalPosition();
         m_moving_window = true;
@@ -189,7 +189,6 @@ void MineWindow::mousePressEvent(QMouseEvent* event) {
 }
 
 void MineWindow::mouseMoveEvent(QMouseEvent* event) {
-    QWidget* child = childAt(event->position());
     if (m_moving_window) {
         const QPointF delta = event->globalPosition() - m_prev_position;
         move(x() + delta.x(), y() + delta.y());
