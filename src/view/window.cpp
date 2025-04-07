@@ -89,11 +89,7 @@ void MineWindow::update_window(const model::MineBoard& new_board, const model::G
     adjustSize();
 }
 
-void MineWindow::render_button(
-        const model::MineSquare& square, 
-        const model::GameState& new_state, 
-        MineButton* button
-    ) {
+void MineWindow::render_button(const model::MineSquare& square, const model::GameState& new_state, MineButton* button) {
     const bool square_revealed = square.is_revealed;
     const bool square_marked = square.is_marked;
     const bool square_has_adj = square.adjacent_mines;
