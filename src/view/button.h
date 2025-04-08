@@ -15,18 +15,18 @@ class MineButton : public QPushButton {
     Q_OBJECT
 public:
     MineButton(const model::MineCoord& coord, QWidget* parent = nullptr);
-    void set_clickable_ui(bool clickable);
+    void setClickableUi(bool clickable);
 
 private slots:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
 
 signals:
-    void enable_surprise_face() const;
-    void disable_surprise_face() const;
+    void enableSurpriseFace() const;
+    void disableSurpriseFace() const;
     // Signal for when the button is clicked (has id as parameter)
-    void lmb_released(const model::MineCoord& id) const;
-    void rmb_released(const model::MineCoord& id) const;
+    void lmbReleased(const model::MineCoord& id) const;
+    void rmbReleased(const model::MineCoord& id) const;
 
 private:
     bool m_clickable;

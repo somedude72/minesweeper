@@ -34,10 +34,12 @@ MineWindow::MineWindow(const model::MineBoard& init_board, QWidget* parent) : QM
     menu_game->setFont(QFont(window_font, 15, 800));
     menu_help->setFont(QFont(window_font, 15, 800));
 
-    int32_t row_size = init_board.row_size();
-    int32_t col_size = init_board.col_size();
+    int32_t row_size = init_board.rowSize();
+    int32_t col_size = init_board.colSize();
     m_buttons.resize(row_size, std::vector<MineButton*>(col_size));
     for (int32_t i = 0; i < row_size; i++) {
+        board_widget_layout->setRowMinimumHeight(i, 26);
+        board_widget_layout->setColumnMinimumWidth(i, 30);
         for (int32_t j = 0; j < col_size; j++) {
             m_buttons[i][j] = new MineButton({ i, j }, board_widget);
             m_buttons[i][j]->setFixedSize(30, 30);
@@ -45,10 +47,10 @@ MineWindow::MineWindow(const model::MineBoard& init_board, QWidget* parent) : QM
             m_buttons[i][j]->setFont(QFont(number_font, 16));
             m_buttons[i][j]->setIconSize(QSize(27, 27));
 
-            connect(m_buttons[i][j], &MineButton::enable_surprise_face, this, &MineWindow::on_enable_surprise_face);
-            connect(m_buttons[i][j], &MineButton::disable_surprise_face, this, &MineWindow::on_disable_surprise_face);
-            connect(m_buttons[i][j], &MineButton::rmb_released, this, &MineWindow::on_mark);
-            connect(m_buttons[i][j], &MineButton::lmb_released, this, &MineWindow::on_reveal);
+            connect(m_buttons[i][j], &MineButton::enableSurpriseFace, this, &MineWindow::onEnableSurpriseFace);
+            connect(m_buttons[i][j], &MineButton::disableSurpriseFace, this, &MineWindow::onDisableSurpriseFace);
+            connect(m_buttons[i][j], &MineButton::rmbReleased, this, &MineWindow::onMark);
+            connect(m_buttons[i][j], &MineButton::lmbReleased, this, &MineWindow::onReveal);
             board_widget_layout->addWidget(m_buttons[i][j], i, j);
         }
     }
@@ -57,29 +59,29 @@ MineWindow::MineWindow(const model::MineBoard& init_board, QWidget* parent) : QM
     m_flag.addPixmap(QPixmap(":/assets/board/flag.png"), QIcon::Normal);
     m_mine.addPixmap(QPixmap(":/assets/board/mine.png"), QIcon::Disabled);
     m_mine.addPixmap(QPixmap(":/assets/board/mine.png"), QIcon::Normal);
-    m_marked_mine.addPixmap(QPixmap(":/assets/board/cross.png"), QIcon::Disabled);
-    m_marked_mine.addPixmap(QPixmap(":/assets/board/cross.png"), QIcon::Normal);
+    m_wrong_mine.addPixmap(QPixmap(":/assets/board/cross.png"), QIcon::Disabled);
+    m_wrong_mine.addPixmap(QPixmap(":/assets/board/cross.png"), QIcon::Normal);
 
-    connect(window_close, &QPushButton::clicked, this, &MineWindow::on_close);
-    connect(window_min, &QPushButton::clicked, this, &MineWindow::on_minimize);
-    connect(ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::on_restart);
-    update_window(init_board, { false, false }, true);
+    connect(window_close, &QPushButton::clicked, this, &MineWindow::onClose);
+    connect(window_min, &QPushButton::clicked, this, &MineWindow::onMinimize);
+    connect(ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::onRestart);
+    updateWindow(init_board, { false, false }, true);
 
     setFixedSize(size());
     LOG_INFO("window: fixed size is {}, {}", size().width(), size().height());
 }
 
-void MineWindow::update_window(const model::MineBoard& new_board, const model::GameState& new_state, bool first_render) {
-    update_control_icon(new_state);
+void MineWindow::updateWindow(const model::MineBoard& new_board, const model::GameState& new_state, bool first_render) {
+    updateControlIcon(new_state);
 
-    int32_t row_size = new_board.row_size();
-    int32_t col_size = new_board.col_size();
+    int32_t row_size = new_board.rowSize();
+    int32_t col_size = new_board.colSize();
     for (int32_t i = 0; i < row_size; i++) {
         for (int32_t j = 0; j < col_size; j++) {
             // Due to the performance overhead of updating/repainting widgets with
             // stylesheets, we should only update mine squares that have been updated.
-            if (first_render || m_prev_state != new_state || new_board.get_square({ i, j }) != m_prev_board.get_square({ i, j })) {
-                render_button(new_board.get_square({ i, j }), new_state, m_buttons[i][j]);
+            if (first_render || m_prev_state != new_state || new_board.getSquare({ i, j }) != m_prev_board.getSquare({ i, j })) {
+                renderButton(new_board.getSquare({ i, j }), new_state, m_buttons[i][j]);
             }
         }
     }
@@ -89,7 +91,7 @@ void MineWindow::update_window(const model::MineBoard& new_board, const model::G
     adjustSize();
 }
 
-void MineWindow::render_button(const model::MineSquare& square, const model::GameState& new_state, MineButton* button) {
+void MineWindow::renderButton(const model::MineSquare& square, const model::GameState& new_state, MineButton* button) {
     const bool square_revealed = square.is_revealed;
     const bool square_marked = square.is_marked;
     const bool square_has_adj = square.adjacent_mines;
@@ -103,11 +105,11 @@ void MineWindow::render_button(const model::MineSquare& square, const model::Gam
         button->setIcon(square_marked ? m_flag : m_no_icon);
         button->setText("");
         button->setDisabled(false);
-        button->set_clickable_ui(new_state.lose || new_state.win || square_marked ? false : true);
+        button->setClickableUi(new_state.lose || new_state.win || square_marked ? false : true);
     } else if (square_revealed) {
         if (square_is_mine) {
             button->setObjectName(square_is_end_reason ? "red_background" : "regular"); // For stylesheet
-            button->setIcon(square_marked ? m_marked_mine : m_mine);
+            button->setIcon(m_mine);
             button->setText("");
             button->setDisabled(true);
         } else if (square_has_adj) {
@@ -122,7 +124,7 @@ void MineWindow::render_button(const model::MineSquare& square, const model::Gam
             button->setDisabled(false);
         } else {
             button->setObjectName("regular");
-            button->setIcon(m_no_icon);
+            button->setIcon(square_marked ? m_wrong_mine : m_no_icon);
             button->setText("");
             button->setDisabled(true);
         }
@@ -132,41 +134,41 @@ void MineWindow::render_button(const model::MineSquare& square, const model::Gam
         button->style()->polish(button);
 }
 
-void MineWindow::on_restart() const {
+void MineWindow::onRestart() const {
     emit restart();
 }
 
-void MineWindow::on_reveal(const model::MineCoord& coord) const {
+void MineWindow::onReveal(const model::MineCoord& coord) const {
     emit reveal(coord);
 }
 
-void MineWindow::on_mark(const model::MineCoord& coord) const {
+void MineWindow::onMark(const model::MineCoord& coord) const {
     emit mark(coord);
 }
 
-void MineWindow::on_close() const {
+void MineWindow::onClose() const {
     emit close();
 }
 
-void MineWindow::on_minimize() const {
+void MineWindow::onMinimize() const {
     emit minimize();
 }
 
-void MineWindow::on_enable_surprise_face() {
+void MineWindow::onEnableSurpriseFace() {
     if (m_prev_state.win || m_prev_state.lose)
         return;
     m_prev_state.revealing_mine = true;
-    update_control_icon(m_prev_state);
+    updateControlIcon(m_prev_state);
 }
 
-void MineWindow::on_disable_surprise_face() {
+void MineWindow::onDisableSurpriseFace() {
     if (m_prev_state.win || m_prev_state.lose)
         return;
     m_prev_state.revealing_mine = false;
-    update_control_icon(m_prev_state);
+    updateControlIcon(m_prev_state);
 }
 
-void MineWindow::update_control_icon(const model::GameState& state) {
+void MineWindow::updateControlIcon(const model::GameState& state) {
     if (state.win) {
         ctrl_button_restart->setIcon(QIcon(":/assets/board/win.png"));
     } else if (state.lose) {

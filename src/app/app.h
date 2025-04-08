@@ -11,15 +11,15 @@ public:
     ~App();
 
 private:
-    void reveal_mines(const model::MineCoord& cause);
+    void revealMines(const model::MineCoord& cause);
 
 private slots:
-    void on_restart();
-    void on_mark(const model::MineCoord& coord);
-    void on_reveal(const model::MineCoord& coord);
+    void onRestart();
+    void onMark(const model::MineCoord& coord);
+    void onReveal(const model::MineCoord& coord);
 
-    void on_close();
-    void on_minimize();
+    void onClose();
+    void onMinimize();
 
 private:
     model::MineBoard m_board;
