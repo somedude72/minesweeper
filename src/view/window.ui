@@ -38,6 +38,7 @@
 
 QWidget#board_widget {
 	margin: 0px 11px 11px 11px;
+    padding: 0px 11px 11px 11px;
 	border: 0px solid gray;
     border-top: 4px solid gray;
 	border-left: 4px solid gray;
@@ -307,13 +308,13 @@ QLabel#window_title {
            <number>15</number>
           </property>
           <property name="topMargin">
-           <number>8</number>
+           <number>4</number>
           </property>
           <property name="rightMargin">
            <number>15</number>
           </property>
           <property name="bottomMargin">
-           <number>24</number>
+           <number>20</number>
           </property>
           <property name="spacing">
            <number>0</number>
