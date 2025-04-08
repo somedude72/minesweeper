@@ -26,19 +26,18 @@ public:
     // check if the row/col to start revealing at is a mine.
     void floodfill(const MineCoord& start);
 
-    const MineSquare& get_square(const MineCoord& get_coord) const;
-    MineSquare& get_square(const MineCoord& get_coord);
+    const MineSquare& getSquare(const MineCoord& get_coord) const;
+    MineSquare& getSquare(const MineCoord& get_coord);
 
+    bool revealAdjacent(const MineCoord& coord);
+    bool didWin() const;
     
-    bool reveal_adjacent(const MineCoord& coord);
-    bool did_win() const;
-    
-    int32_t row_size() const;
-    int32_t col_size() const;
+    int32_t rowSize() const;
+    int32_t colSize() const;
 
 private:
-    void generate_mines(); 
-    void count_adjacent(); 
+    void generateMines(); 
+    void countAdjacent(); 
 
 private:
     std::vector<std::vector<MineSquare>> m_board;

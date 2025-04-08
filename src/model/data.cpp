@@ -1,6 +1,5 @@
 #include "model/data.h"
 #include "utils/config.h"
-#include "utils/config.h"
 
 #include <ctime>
 #include <cassert>
@@ -26,8 +25,8 @@ namespace model {
 MineBoard::MineBoard(uint32_t row_num, uint32_t col_num) {
     LOG_INFO("board: initializing {} by {} board", row_num, col_num);
     m_board.resize(row_num, std::vector<MineSquare>(col_num));
-    generate_mines();
-    count_adjacent();
+    generateMines();
+    countAdjacent();
 }
 
 void MineBoard::floodfill(const MineCoord& start) {
@@ -46,9 +45,11 @@ void MineBoard::floodfill(const MineCoord& start) {
         for (int32_t i = 0; i < 8; i++) {
             int32_t new_row = curr.row + dir_row[i];
             int32_t new_col = curr.col + dir_col[i];
-            if (new_row < 0 || new_col < 0 || new_row >= row_size() || new_col >= col_size())
+            if (new_row < 0 || new_col < 0 || new_row >= rowSize() || new_col >= colSize())
                 continue;
             if (m_board[new_row][new_col].is_mine || m_board[new_row][new_col].is_revealed)
+                continue;
+            if (m_board[new_row][new_col].is_marked)
                 continue;
             m_board[new_row][new_col].is_revealed = true;
             queue.push({ new_row, new_col });
@@ -56,58 +57,60 @@ void MineBoard::floodfill(const MineCoord& start) {
     }
 }
 
-bool MineBoard::reveal_adjacent(const MineCoord& coord) {
+bool MineBoard::revealAdjacent(const MineCoord& coord) {
     int flag_nums = 0;
+    bool is_mine = false;
     const int dir_row[8] = { -1, -1, -1, 0, 0, 1, 1, 1 };
     const int dir_col[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
     for (int i = 0; i < 8; i++) {
         int new_row = coord.row + dir_row[i];
         int new_col = coord.col + dir_col[i];
-        if (new_row < 0 || new_col < 0 || new_row >= row_size() || new_col >= col_size())
+        if (new_row < 0 || new_col < 0 || new_row >= rowSize() || new_col >= colSize())
             continue;
         if (m_board[new_row][new_col].is_marked) {
             flag_nums++;
+        } else if (m_board[new_row][new_col].is_mine) {
+            is_mine = true;
         }
     }
 
 
     if (flag_nums != m_board[coord.row][coord.col].adjacent_mines)
         return false;
-
-    bool is_mine = false;
     for (int i = 0; i < 8; i++) {
         int new_row = coord.row + dir_row[i];
         int new_col = coord.col + dir_col[i];
-        if (new_row < 0 || new_col < 0 || new_row >= row_size() || new_col >= col_size() || m_board[new_row][new_col].is_marked)
+        if (new_row < 0 || new_col < 0 || new_row >= rowSize() || new_col >= colSize() || m_board[new_row][new_col].is_marked)
             continue;
         if (m_board[new_row][new_col].is_mine) {
             m_board[new_row][new_col].is_end_reason = true;
-            is_mine = true;
+        } else if (is_mine) {
+            m_board[new_row][new_col].is_revealed = true;
+        } else {
+            floodfill({ new_row, new_col });
         }
-
-        m_board[new_row][new_col].is_revealed = true;
     }
     
     return is_mine;
 }
 
-const MineSquare& MineBoard::get_square(const MineCoord& get_coord) const {
+const MineSquare& MineBoard::getSquare(const MineCoord& get_coord) const {
     return m_board[get_coord.row][get_coord.col];
 }
 
-MineSquare& MineBoard::get_square(const MineCoord& get_coord) {
+MineSquare& MineBoard::getSquare(const MineCoord& get_coord) {
     return m_board[get_coord.row][get_coord.col];
 }
 
-int32_t MineBoard::row_size() const {
+int32_t MineBoard::rowSize() const {
     return m_board.size();
 }
 
-int32_t MineBoard::col_size() const {
+int32_t MineBoard::colSize() const {
     return m_board[0].size();
 }
 
-bool MineBoard::did_win() const {
+bool MineBoard::didWin() const {
     for (int i = 0; i < m_board.size(); i++) {
         for (int j = 0; j < m_board[0].size(); j++) {
             if (!m_board[i][j].is_revealed && !m_board[i][j].is_mine) {
@@ -122,10 +125,10 @@ bool MineBoard::did_win() const {
     return true;
 }
 
-void MineBoard::generate_mines() {
+void MineBoard::generateMines() {
     std::srand(std::time(nullptr));
-    int32_t max_row = row_size();
-    int32_t max_col = col_size();
+    int32_t max_row = rowSize();
+    int32_t max_col = colSize();
     
     for (int32_t i = 0; i < max_row; i++) {
         for (int32_t j = 0; j < max_col; j++) {
@@ -137,9 +140,9 @@ void MineBoard::generate_mines() {
     }
 }
 
-void MineBoard::count_adjacent() {
-    int32_t max_row = row_size();
-    int32_t max_col = col_size();
+void MineBoard::countAdjacent() {
+    int32_t max_row = rowSize();
+    int32_t max_col = colSize();
 
     for (int32_t i = 0; i < max_row; i++) {
         for (int32_t j = 0; j < max_col; j++) {

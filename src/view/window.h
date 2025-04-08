@@ -18,7 +18,7 @@ public:
     // Constructs a game window with an initial state. The state will be pushed into a
     // QGridLayout, with the mine board buttons generated dynamically
     MineWindow(const model::MineBoard& init_board, QWidget* parent = nullptr);
-    void update_window(const model::MineBoard& new_board, const model::GameState& new_state, bool first_render = false);
+    void updateWindow(const model::MineBoard& new_board, const model::GameState& new_state, bool first_render = false);
 
 protected:
     // Qt custom title bar movement mouse events
@@ -28,16 +28,16 @@ protected:
 
 private slots:
     // When a square is pressed, change the face of the restart button to surprised icon
-    void on_enable_surprise_face();
-    void on_disable_surprise_face();
+    void onEnableSurpriseFace();
+    void onDisableSurpriseFace();
 
     // These slots all emit signals to app controller
-    void on_restart() const;
-    void on_reveal(const model::MineCoord& coord) const;
-    void on_mark(const model::MineCoord& coord) const;
+    void onRestart() const;
+    void onReveal(const model::MineCoord& coord) const;
+    void onMark(const model::MineCoord& coord) const;
 
-    void on_close() const;
-    void on_minimize() const;
+    void onClose() const;
+    void onMinimize() const;
 
 signals:
     void restart() const;
@@ -48,8 +48,8 @@ signals:
     void minimize() const;
 
 private:
-    void update_control_icon(const model::GameState& state);
-    void render_button(const model::MineSquare& square, const model::GameState& state, MineButton* button_view);
+    void updateControlIcon(const model::GameState& state);
+    void renderButton(const model::MineSquare& square, const model::GameState& state, MineButton* button_view);
 
 private:
     model::GameState m_prev_state;
@@ -65,7 +65,7 @@ private:
     // https://stackoverflow.com/questions/11314429/select-moving-qwidget-in-the-screen
     QPointF m_prev_position;
     bool m_moving_window = false;
-    QIcon m_flag, m_mine, m_marked_mine, m_no_icon;
+    QIcon m_flag, m_mine, m_wrong_mine, m_no_icon;
 
 };
 
