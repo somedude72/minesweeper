@@ -20,7 +20,6 @@ MineWindow::MineWindow(const model::MineBoard& init_board, QWidget* parent) : QM
     setupUi(this);
     
     LOG_INFO("window: initializing main ui");
-    LOG_INFO("window: fixed size is {}, {}", size().width(), size().height());
 
     // From https://stackoverflow.com/questions/30973781/qt-add-custom-font-from-resource
     int window_font_id = QFontDatabase::addApplicationFont(":/assets/window/font.otf");
@@ -65,6 +64,9 @@ MineWindow::MineWindow(const model::MineBoard& init_board, QWidget* parent) : QM
     connect(window_min, &QPushButton::clicked, this, &MineWindow::on_minimize);
     connect(ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::on_restart);
     update_window(init_board, { false, false }, true);
+
+    setFixedSize(size());
+    LOG_INFO("window: fixed size is {}, {}", size().width(), size().height());
 }
 
 void MineWindow::update_window(const model::MineBoard& new_board, const model::GameState& new_state, bool first_render) {
@@ -84,7 +86,7 @@ void MineWindow::update_window(const model::MineBoard& new_board, const model::G
     
     m_prev_state = new_state;
     m_prev_board = new_board;
-    // adjustSize();
+    adjustSize();
 }
 
 void MineWindow::render_button(const model::MineSquare& square, const model::GameState& new_state, MineButton* button) {
