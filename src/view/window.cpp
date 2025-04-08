@@ -7,11 +7,13 @@
 #include "QPoint"
 #include "QMouseEvent"
 
+#include "QGuiApplication"
 #include "QFontDatabase"
 #include "QIcon"
 #include "QStyle"
 #include "QPixmap"
 
+#include <algorithm>
 #include <cstdint>
 
 namespace view {
@@ -20,6 +22,8 @@ MineWindow::MineWindow(const model::MineBoard& init_board, QWidget* parent) : QM
     setupUi(this);
     
     LOG_INFO("window: initializing main ui");
+    QRect screen_size = QGuiApplication::primaryScreen()->geometry();
+    const int32_t min_size = std::min(screen_size.height(), screen_size.width());
 
     // From https://stackoverflow.com/questions/30973781/qt-add-custom-font-from-resource
     int window_font_id = QFontDatabase::addApplicationFont(":/assets/window/font.otf");
@@ -38,14 +42,14 @@ MineWindow::MineWindow(const model::MineBoard& init_board, QWidget* parent) : QM
     int32_t col_size = init_board.colSize();
     m_buttons.resize(row_size, std::vector<MineButton*>(col_size));
     for (int32_t i = 0; i < row_size; i++) {
-        board_widget_layout->setRowMinimumHeight(i, 26);
-        board_widget_layout->setColumnMinimumWidth(i, 30);
+        board_widget_layout->setRowMinimumHeight(i, min_size / 47);
+        board_widget_layout->setColumnMinimumWidth(i, min_size / 40);
         for (int32_t j = 0; j < col_size; j++) {
             m_buttons[i][j] = new MineButton({ i, j }, board_widget);
-            m_buttons[i][j]->setFixedSize(30, 30);
+            m_buttons[i][j]->setFixedSize(min_size / 40, min_size / 40);
             m_buttons[i][j]->setContentsMargins(0, 0, 0, 0);
             m_buttons[i][j]->setFont(QFont(number_font, 16));
-            m_buttons[i][j]->setIconSize(QSize(27, 27));
+            m_buttons[i][j]->setIconSize(QSize(min_size / 45, min_size / 45));
 
             connect(m_buttons[i][j], &MineButton::enableSurpriseFace, this, &MineWindow::onEnableSurpriseFace);
             connect(m_buttons[i][j], &MineButton::disableSurpriseFace, this, &MineWindow::onDisableSurpriseFace);
