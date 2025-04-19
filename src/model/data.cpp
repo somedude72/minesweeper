@@ -132,7 +132,7 @@ void MineBoard::generateMines() {
     
     for (int32_t i = 0; i < max_row; i++) {
         for (int32_t j = 0; j < max_col; j++) {
-            if (random_num(1, 10) == 1) {
+            if (random_num(1, 8) == 1) {
                 m_board[i][j].is_mine = true;
                 m_board[i][j].adjacent_mines = 0;
             }
