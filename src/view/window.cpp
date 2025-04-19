@@ -1,6 +1,7 @@
 #include "view/window.h"
-#include "model/data.h"
 #include "view/button.h"
+#include "model/data.h"
+#include "model/screen.h"
 #include "utils/config.h"
 
 #include "QString"
@@ -13,42 +14,30 @@
 #include "QStyle"
 #include "QPixmap"
 
-#include <algorithm>
 #include <cstdint>
 
 namespace view {
 
 MineWindow::MineWindow(const model::MineBoard& init_board, QWidget* parent) : QMainWindow(parent) {
-    setupUi(this);
-    
     LOG_INFO("window: initializing main ui");
-    QRect screen_size = QGuiApplication::primaryScreen()->geometry();
-    const int32_t min_size = std::min(screen_size.height(), screen_size.width());
-
-    // From https://stackoverflow.com/questions/30973781/qt-add-custom-font-from-resource
-    int window_font_id = QFontDatabase::addApplicationFont(":/assets/window/font.otf");
-    int board_font_id = QFontDatabase::addApplicationFont(":/assets/board/font.ttf");
-    QString window_font = QFontDatabase::applicationFontFamilies(window_font_id).at(0);
-    QString number_font = QFontDatabase::applicationFontFamilies(board_font_id).at(0);
-
-    window_close->setIcon(QIcon(":/assets/window/close.png"));
-    window_min->setIcon(QIcon(":/assets/window/minimize.png"));
-    window_title->setFont(QFont(window_font, 18));
+    setupUi(this);
+    setFontAndIcons();
     
-    menu_game->setFont(QFont(window_font, 15, 800));
-    menu_help->setFont(QFont(window_font, 15, 800));
-
-    int32_t row_size = init_board.rowSize();
-    int32_t col_size = init_board.colSize();
+    menu_game->addAction(new QAction("test action", this));
+    
+    const int32_t row_size = init_board.rowSize();
+    const int32_t col_size = init_board.colSize();
+    const int32_t min_size = model::Screen::getMinSize();
+    board_widget_layout->setContentsMargins(11 + min_size / 300, min_size / 300, 11 + min_size / 300, 11 + min_size / 300);
     m_buttons.resize(row_size, std::vector<MineButton*>(col_size));
+
     for (int32_t i = 0; i < row_size; i++) {
-        board_widget_layout->setRowMinimumHeight(i, min_size / 47);
-        board_widget_layout->setColumnMinimumWidth(i, min_size / 40);
+        board_widget_layout->setRowMinimumHeight(i, min_size / 55);
         for (int32_t j = 0; j < col_size; j++) {
             m_buttons[i][j] = new MineButton({ i, j }, board_widget);
             m_buttons[i][j]->setFixedSize(min_size / 40, min_size / 40);
             m_buttons[i][j]->setContentsMargins(0, 0, 0, 0);
-            m_buttons[i][j]->setFont(QFont(number_font, 16));
+            m_buttons[i][j]->setFont(QFont(m_board_font, min_size / 80));
             m_buttons[i][j]->setIconSize(QSize(min_size / 45, min_size / 45));
 
             connect(m_buttons[i][j], &MineButton::enableSurpriseFace, this, &MineWindow::onEnableSurpriseFace);
@@ -59,18 +48,12 @@ MineWindow::MineWindow(const model::MineBoard& init_board, QWidget* parent) : QM
         }
     }
 
-    m_flag.addPixmap(QPixmap(":/assets/board/flag.png"), QIcon::Disabled);
-    m_flag.addPixmap(QPixmap(":/assets/board/flag.png"), QIcon::Normal);
-    m_mine.addPixmap(QPixmap(":/assets/board/mine.png"), QIcon::Disabled);
-    m_mine.addPixmap(QPixmap(":/assets/board/mine.png"), QIcon::Normal);
-    m_wrong_mine.addPixmap(QPixmap(":/assets/board/cross.png"), QIcon::Disabled);
-    m_wrong_mine.addPixmap(QPixmap(":/assets/board/cross.png"), QIcon::Normal);
-
     connect(window_close, &QPushButton::clicked, this, &MineWindow::onClose);
     connect(window_min, &QPushButton::clicked, this, &MineWindow::onMinimize);
     connect(ctrl_button_restart, &QPushButton::clicked, this, &MineWindow::onRestart);
     updateWindow(init_board, { false, false }, true);
 
+    adjustSize();
     setFixedSize(size());
     LOG_INFO("window: fixed size is {}, {}", size().width(), size().height());
 }
@@ -123,8 +106,8 @@ void MineWindow::renderButton(const model::MineSquare& square, const model::Game
             // code for the font pack.
             char16_t temp[2] = { (char16_t) (74 + square.adjacent_mines), '\0' };
             button->setObjectName("mine_" + QString::number(square.adjacent_mines)); // For stylesheet
-            button->setIcon(m_no_icon);
-            button->setText(QString::fromUtf16(temp));
+            button->setIcon(square_marked ? m_wrong_mine : m_no_icon);
+            button->setText(square_marked ? "" : QString::fromUtf16(temp));
             button->setDisabled(false);
         } else {
             button->setObjectName("regular");
@@ -136,6 +119,28 @@ void MineWindow::renderButton(const model::MineSquare& square, const model::Game
 
     if (button->objectName() != prev_name)
         button->style()->polish(button);
+}
+
+void MineWindow::setFontAndIcons() {
+    // From https://stackoverflow.com/questions/30973781/qt-add-custom-font-from-resource
+    const int32_t window_font_id = QFontDatabase::addApplicationFont(":/assets/window/font.otf");
+    const int32_t board_font_id = QFontDatabase::addApplicationFont(":/assets/board/font.ttf");
+    m_window_font = QFontDatabase::applicationFontFamilies(window_font_id).at(0);
+    m_board_font = QFontDatabase::applicationFontFamilies(board_font_id).at(0);
+
+    window_close->setIcon(QIcon(":/assets/window/close.png"));
+    window_min->setIcon(QIcon(":/assets/window/minimize.png"));
+    window_title->setFont(QFont(m_window_font, 18));
+    
+    menu_game->setFont(QFont(m_window_font, 15));
+    menu_help->setFont(QFont(m_window_font, 15));
+
+    m_flag.addPixmap(QPixmap(":/assets/board/flag.png"), QIcon::Disabled);
+    m_flag.addPixmap(QPixmap(":/assets/board/flag.png"), QIcon::Normal);
+    m_mine.addPixmap(QPixmap(":/assets/board/mine.png"), QIcon::Disabled);
+    m_mine.addPixmap(QPixmap(":/assets/board/mine.png"), QIcon::Normal);
+    m_wrong_mine.addPixmap(QPixmap(":/assets/board/cross.png"), QIcon::Disabled);
+    m_wrong_mine.addPixmap(QPixmap(":/assets/board/cross.png"), QIcon::Normal);
 }
 
 void MineWindow::onRestart() const {
