@@ -35,6 +35,10 @@ else()
     set(LIBRARIES ${LIBRARIES} spdlog::spdlog)
 endif()
 
+# Fmt
+find_package(fmt REQUIRED)
+set(LIBRARIES ${LIBRARIES} fmt::fmt)
+
 
 #####################
 ## Project sources ##
@@ -44,6 +48,7 @@ set(SOURCES
     src/main.cpp
     src/app/app.cpp
     src/model/data.cpp
+    src/model/screen.cpp
     src/view/button.cpp
     src/view/window.cpp
     src/view/window.ui
