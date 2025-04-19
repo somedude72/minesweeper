@@ -48,6 +48,7 @@ signals:
     void minimize() const;
 
 private:
+    void setFontAndIcons();
     void updateControlIcon(const model::GameState& state);
     void renderButton(const model::MineSquare& square, const model::GameState& state, MineButton* button_view);
 
@@ -60,12 +61,14 @@ private:
     // are destroyed, Qt automatically calls the destructor on each of its children.
     std::vector<std::vector<MineButton*>> m_buttons;
 
+    QString m_board_font, m_window_font;
+    QIcon m_flag, m_mine, m_wrong_mine, m_no_icon;
+
 private:
     // Custom title bar implementation partially taken from
     // https://stackoverflow.com/questions/11314429/select-moving-qwidget-in-the-screen
     QPointF m_prev_position;
     bool m_moving_window = false;
-    QIcon m_flag, m_mine, m_wrong_mine, m_no_icon;
 
 };
 

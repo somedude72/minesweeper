@@ -1,9 +1,140 @@
+#include <cstdint>
+#include <string>
+
 #include "QApplication"
+#include "QStyle"
+#include "fmt/format.h"
 
 #include "app/app.h"
+#include "model/screen.h"
 #include "view/window.h"
 #include "model/data.h"
 #include "utils/config.h"
+
+// {0} = thick border size
+// {1} = thin border size
+// {2} = font size
+static const std::string app_style = R"(
+QWidget#root_grid {{
+	border: 0px solid gray;
+    border-right: {0}px solid gray;
+	border-bottom: {0}px solid gray;
+	border-top: {0}px solid white;
+	border-left: {0}px solid white;
+    background-color: rgb(205, 205, 205);
+}}
+
+QWidget#board_widget {{
+	margin: 0px 11px 11px 11px;
+	border: 0px solid gray;
+    border-top: {0}px solid gray;
+	border-left: {0}px solid gray;
+	border-right: {0}px solid white;
+	border-bottom: {0}px solid white;
+    background-color: rgb(205, 205, 205);
+    color: rgb(0, 0, 0);
+}}
+
+QWidget#control_widget {{
+	margin: 11px 11px 11px 11px;
+	border: 0px solid gray;
+    border-top: {0}px solid gray;
+	border-left: {0}px solid gray;
+	border-right: {0}px solid white;
+	border-bottom: {0}px solid white;
+    background-color: rgb(205, 205, 205);
+    color: rgb(0, 0, 0);
+}}
+
+QPushButton#ctrl_button_restart {{
+    border: 0px solid gray;
+    border-right: {0}px solid gray;
+	border-bottom: {0}px solid gray;
+	border-top: {0}px solid white;
+	border-left: {0}px solid white;
+    background-color: rgb(205, 205, 205);
+	margin-top: 19px;
+	margin-bottom: 19px;
+    color: rgb(0, 0, 0);
+}}
+        
+QPushButton#ctrl_button_restart:pressed {{
+	border: 0px solid gray;
+    border-right: {0}px solid white;
+	border-bottom: {0}px solid white;
+	border-top: {0}px solid gray;
+	border-left: {0}px solid gray;
+    background-color: rgb(205, 205, 205);
+    color: rgb(0, 0, 0);
+}}
+
+QWidget#window_bar {{
+    margin: 4px 6px 0px 6px;
+    background-color: rgb(0, 0, 148);
+}}
+
+QPushButton#window_close {{
+    border: 0px solid gray;
+    border-right: {1}px solid gray;
+	border-bottom: {1}px solid gray;
+	border-top: {1}px solid white;
+	border-left: {1}px solid white;
+    background-color: rgb(205, 205, 205);
+    color: rgb(0, 0, 0);
+}}
+        
+QPushButton#window_close:pressed {{
+	border: 0px solid gray;
+    border-right: {1}px solid white;
+	border-bottom: {1}px solid white;
+	border-top: {1}px solid gray;
+	border-left: {1}px solid gray;
+    background-color: rgb(205, 205, 205);
+    color: rgb(0, 0, 0);
+}}
+
+QPushButton#window_min {{
+    border: 0px solid gray;
+    border-right: {1}px solid gray;
+	border-bottom: {1}px solid gray;
+	border-top: {1}px solid white;
+	border-left: {1}px solid white;
+    background-color: rgb(205, 205, 205);
+    color: rgb(0, 0, 0);
+}}
+        
+QPushButton#window_min:pressed {{
+	border: 0px solid gray;
+    border-right: {1}px solid white;
+	border-bottom: {1}px solid white;
+	border-top: {1}px solid gray;
+	border-left: {1}px solid gray;
+    background-color: rgb(205, 205, 205);
+    color: rgb(0, 0, 0);
+}}
+
+.QToolButton {{
+    margin-top: 2px;
+    border: 0px solid black;
+    color: black;
+}}
+
+.QToolButton:pressed {{
+    padding: 0px;
+    background-color: rgb(245, 245, 245);
+    font-size: {2};
+    color: black;
+}}
+
+.QToolButton::menu-indicator {{
+    image: none;
+}}
+
+QLabel#window_title {{
+    margin: 0px 0px 2px 2px;
+    color: rgb(255, 255, 255);
+}}
+)";
 
 App::App(int argc, char** argv) : QApplication(argc, argv) {
     SET_LOG_PRIORITY(DEBUG_LEVEL);
@@ -16,14 +147,21 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
     m_board = model::MineBoard(30, 50);
     m_window = new view::MineWindow(m_board);
     m_window->setWindowFlags(Qt::FramelessWindowHint);
+    m_window->show();
 
+    const int32_t min_size = model::Screen::getMinSize();
+    setStyleSheet(QString::fromStdString(fmt::format(app_style,
+        min_size / 300,
+        min_size / 450,
+        min_size / 75
+    )));
+    
     connect(m_window, &view::MineWindow::restart, this, &App::onRestart);
     connect(m_window, &view::MineWindow::reveal, this, &App::onReveal);
     connect(m_window, &view::MineWindow::mark, this, &App::onMark);
-
+    
     connect(m_window, &view::MineWindow::close, this, &App::onClose);
     connect(m_window, &view::MineWindow::minimize, this, &App::onMinimize);
-    m_window->show();
 }
 
 App::~App() {
@@ -65,7 +203,8 @@ void App::onMark(const model::MineCoord& coord) {
 
     LOG_INFO("app: received mark signal at ({}, {})", coord.row, coord.col);
     model::MineSquare& square = m_board.getSquare(coord);
-    square.is_marked = !square.is_marked;
+    if (!square.is_revealed)
+        square.is_marked = !square.is_marked;
     m_window->updateWindow(m_board, { m_game_won, m_game_over, false });
 }
 
