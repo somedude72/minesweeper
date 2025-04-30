@@ -11,8 +11,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
 
-# set(CMAKE_OSX_ARCHITECTURES arm64;x86_64)
-
+set(TARGET_VERSION 0.0.1)
+set(TARGET_BUILD_NUM 2025.4.30)
+add_compile_definitions(TARGET_VERSION=${TARGET_VERSION}+${TARGET_BUILD_NUM})
 
 #######################
 ## Project libraries ##
@@ -52,11 +53,18 @@ set(SOURCES
     src/view/button.cpp
     src/view/window.cpp
     src/view/window.ui
+    src/view/about.h
+    src/view/about.cpp
+    src/view/about.ui
 )
 
 ####################
 ## Project assets ##
 ####################
+
+set(INFO_PLIST_IN "assets/macos/info.plist.in")
+set(INFO_PLIST "assets/macos/info.plist")
+configure_file(${INFO_PLIST_IN} ${INFO_PLIST} @ONLY)
 
 set(ASSETS
     assets/board/dead.png
@@ -72,8 +80,10 @@ set(ASSETS
     assets/window/close.png
     assets/window/minimize.png
     assets/window/font.otf
-)
 
+    assets/icon.png
+    assets/macos/mac-icon.png
+)
 
 #################################
 ## Project include directories ##
@@ -104,4 +114,4 @@ set_source_files_properties(${ASSETS}
     MACOSX_PACKAGE_LOCATION "Resources/"
 )
 
-# install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)
+install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)
