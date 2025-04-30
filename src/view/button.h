@@ -2,10 +2,10 @@
 
 #include "model/data.h"
 
-#include "QPushButton"
-#include "QMouseEvent"
-#include "QPoint"
-#include "QWidget"
+#include <QPushButton>
+#include <QMouseEvent>
+#include <QPoint>
+#include <QWidget>
 
 namespace view {
 
