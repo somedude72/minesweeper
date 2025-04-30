@@ -1,8 +1,8 @@
 #pragma once 
 
-#include "QGuiApplication"
-#include "QScreen"
-#include "QRect"
+#include <QGuiApplication>
+#include <QScreen>
+#include <QRect>
 
 #include <cstdint>
 

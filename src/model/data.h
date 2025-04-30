@@ -5,48 +5,9 @@
 
 namespace model {
 
-struct GameSettings;    // Represents the user defined settings of the game
-struct GameState;       // Represents whether or not the user has won, lost,
-                        // or is currently revealing a mine
-struct MineSquare;      // Data representation of a square in MineBoard
-struct MineCoord;       // For succinct representation of a coordinate when
-                        // interfacing with the MineBoard class. 
-class MineBoard {
-public:
-
-    MineBoard() = default;
-    MineBoard(const MineBoard& other) = default;
-
-    // Construct a new MineBoard object with row number of rows and col number of
-    // columns; also procedurally generating the mines.
-    MineBoard(uint32_t row, uint32_t col);
-
-    // This will reveal all neighboring squares that does not have mines adjacent to
-    // them, starting from the start coordinate. Note that this function will not
-    // check if the row/col to start revealing at is a mine.
-    void floodfill(const MineCoord& start);
-
-    const MineSquare& getSquare(const MineCoord& get_coord) const;
-    MineSquare& getSquare(const MineCoord& get_coord);
-
-    bool revealAdjacent(const MineCoord& coord);
-    bool didWin() const;
-    
-    int32_t rowSize() const;
-    int32_t colSize() const;
-
-private:
-    void generateMines(); 
-    void countAdjacent(); 
-
-private:
-    std::vector<std::vector<MineSquare>> m_board;
-
-};
-
 struct GameSettings {
-    uint32_t row_size, col_size, num_mines;
-    bool is_safe_first_move;
+    uint32_t row_size = 9, col_size = 9, num_mines = 10;
+    bool is_safe_first_move = true;
 };
 
 struct GameState {
@@ -83,6 +44,42 @@ struct MineSquare {
     inline bool operator!=(const MineSquare& other) const {
         return !(*this == other);
     }
+};
+
+
+class MineBoard {
+public:
+
+    MineBoard() = default;
+    MineBoard(const MineBoard& other) = default;
+
+    // Construct a new MineBoard object with row number of rows and col number of
+    // columns; also procedurally generating the mines.
+    MineBoard(const GameSettings& settings);
+    void setupBoard();
+
+    // This will reveal all neighboring squares that does not have mines adjacent to
+    // them, starting from the start coordinate. Note that this function will not
+    // check if the row/col to start revealing at is a mine.
+    void floodfill(const MineCoord& start);
+
+    const MineSquare& getSquare(const MineCoord& get_coord) const;
+    MineSquare& getSquare(const MineCoord& get_coord);
+
+    bool revealAdjacent(const MineCoord& coord);
+    bool didWin() const;
+    
+    int32_t rowSize() const;
+    int32_t colSize() const;
+
+private:
+    void generateMines(); 
+    void countAdjacent(); 
+
+private:
+    GameSettings m_settings;
+    std::vector<std::vector<MineSquare>> m_board;
+
 };
 
 } // namespace model
