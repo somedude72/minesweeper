@@ -3,8 +3,8 @@
 #include "model/data.h"
 #include "fmt/format.h"
 
-#include "QPushButton"
-#include "QMouseEvent"
+#include <QPushButton>
+#include <QMouseEvent>
 
 static const std::string button_style = R"(
 

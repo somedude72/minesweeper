@@ -1,19 +1,20 @@
 #include <cstdint>
 #include <string>
 
-#include "QApplication"
-#include "QStyle"
-#include "fmt/format.h"
+#include <QApplication>
+#include <QStyle>
+#include <fmt/format.h>
 
 #include "app/app.h"
-#include "model/screen.h"
+#include "view/about.h"
 #include "view/window.h"
 #include "model/data.h"
+
 #include "utils/config.h"
 
 // {0} = thick border size
 // {1} = thin border size
-// {2} = font size
+// {2} = vertical spacing (control widget)
 static const std::string app_style = R"(
 QWidget#root_grid {{
 	border: 0px solid gray;
@@ -36,7 +37,7 @@ QWidget#board_widget {{
 }}
 
 QWidget#control_widget {{
-	margin: 11px 11px 11px 11px;
+	margin: 4px 11px 11px 11px;
 	border: 0px solid gray;
     border-top: {0}px solid gray;
 	border-left: {0}px solid gray;
@@ -53,8 +54,8 @@ QPushButton#ctrl_button_restart {{
 	border-top: {0}px solid white;
 	border-left: {0}px solid white;
     background-color: rgb(205, 205, 205);
-	margin-top: 19px;
-	margin-bottom: 19px;
+	margin-top: 12px;
+	margin-bottom: 17px;
     color: rgb(0, 0, 0);
 }}
         
@@ -113,6 +114,15 @@ QPushButton#window_min:pressed {{
     color: rgb(0, 0, 0);
 }}
 
+QLabel#window_title {{
+    margin: 0px 0px 2px 2px;
+    color: rgb(255, 255, 255);
+}}
+
+.QToolButton::menu-indicator {{
+    image: none;
+}}
+
 .QToolButton {{
     margin-top: 2px;
     border: 0px solid black;
@@ -122,50 +132,46 @@ QPushButton#window_min:pressed {{
 .QToolButton:pressed {{
     padding: 0px;
     background-color: rgb(245, 245, 245);
-    font-size: {2};
     color: black;
-}}
-
-.QToolButton::menu-indicator {{
-    image: none;
-}}
-
-QLabel#window_title {{
-    margin: 0px 0px 2px 2px;
-    color: rgb(255, 255, 255);
 }}
 )";
 
 App::App(int argc, char** argv) : QApplication(argc, argv) {
-    SET_LOG_PRIORITY(DEBUG_LEVEL);
+    SET_LOG_PRIORITY(DEBUG_LEVEL); // this is unused lol
     SET_LOG_PATTERN("[%a, %b %d %H:%M:%S] [%l] %v");
     LOG_INFO("app: logging initiated (this is a test message)");
+
+    setStyleSheet(QString::fromStdString(fmt::format(app_style,
+        min_size / 300,
+        min_size / 450,
+        min_size / 450
+    )));
 
     m_game_over = false;
     m_game_won = false;
 
-    m_board = model::MineBoard(30, 50);
-    m_window = new view::MineWindow(m_board);
-    m_window->setWindowFlags(Qt::FramelessWindowHint);
-    m_window->show();
+    m_settings = model::GameSettings();
+    m_board = model::MineBoard(m_settings);
+    m_board.setupBoard();
+    m_game_window = new view::GameWindow(m_board);
+    m_game_window->setWindowFlags(Qt::FramelessWindowHint);
+    m_game_window->initBoard(m_board, { false, false }, true);
+    m_game_window->show();
+    
+    connect(m_game_window, &view::GameWindow::restart, this, &App::onRestart);
+    connect(m_game_window, &view::GameWindow::reveal, this, &App::onReveal);
+    connect(m_game_window, &view::GameWindow::mark, this, &App::onMark);
+    connect(m_game_window, &view::GameWindow::actionAbout, this, &App::onActionAbout);
+    connect(m_game_window, &view::GameWindow::actionBeginner, this, &App::onActionBeginner);
+    connect(m_game_window, &view::GameWindow::actionIntermediate, this, &App::onActionIntermediate);
+    connect(m_game_window, &view::GameWindow::actionAdvanced, this, &App::onActionAdvanced);
 
-    const int32_t min_size = model::Screen::getMinSize();
-    setStyleSheet(QString::fromStdString(fmt::format(app_style,
-        min_size / 300,
-        min_size / 450,
-        min_size / 75
-    )));
-    
-    connect(m_window, &view::MineWindow::restart, this, &App::onRestart);
-    connect(m_window, &view::MineWindow::reveal, this, &App::onReveal);
-    connect(m_window, &view::MineWindow::mark, this, &App::onMark);
-    
-    connect(m_window, &view::MineWindow::close, this, &App::onClose);
-    connect(m_window, &view::MineWindow::minimize, this, &App::onMinimize);
+    connect(m_game_window, &view::GameWindow::close, this, &App::onClose);
+    connect(m_game_window, &view::GameWindow::minimize, this, &App::onMinimize);
 }
 
 App::~App() {
-    delete m_window;
+    delete m_game_window;
     LOG_INFO("app: deallocated window object");
     LOG_INFO("app: terminating application");
 }
@@ -191,8 +197,15 @@ void App::onRestart() {
     LOG_INFO("app: received restart game signal");
     m_game_over = false;
     m_game_won = false;
-    m_board = model::MineBoard(30, 50);
-    m_window->updateWindow(m_board, { m_game_won, m_game_over, false });
+    if (m_board.rowSize() == m_settings.row_size && m_board.colSize() == m_settings.col_size) {
+        m_board = model::MineBoard(m_settings);
+        m_board.setupBoard();
+        m_game_window->updateBoard(m_board, { m_game_won, m_game_over, false });
+    } else {
+        m_board = model::MineBoard(m_settings);
+        m_board.setupBoard();
+        m_game_window->initBoard(m_board, { m_game_won, m_game_over, false });
+    }
 }
 
 void App::onMark(const model::MineCoord& coord) {
@@ -205,7 +218,7 @@ void App::onMark(const model::MineCoord& coord) {
     model::MineSquare& square = m_board.getSquare(coord);
     if (!square.is_revealed)
         square.is_marked = !square.is_marked;
-    m_window->updateWindow(m_board, { m_game_won, m_game_over, false });
+    m_game_window->updateBoard(m_board, { m_game_won, m_game_over, false });
 }
 
 void App::onReveal(const model::MineCoord& coord) {
@@ -220,25 +233,57 @@ void App::onReveal(const model::MineCoord& coord) {
     if (square.is_mine) {
         revealMines(coord);
         m_game_over = true;
-        m_window->updateWindow(m_board, { m_game_won, m_game_over, false });
+        m_game_window->updateBoard(m_board, { m_game_won, m_game_over, false });
     } else if (!square.is_revealed) {
         m_board.floodfill(coord);
-        m_window->updateWindow(m_board, { m_game_won, m_game_over, false });
+        m_game_window->updateBoard(m_board, { m_game_won, m_game_over, false });
     } else {
         bool is_mine = m_board.revealAdjacent(coord);
         if (is_mine) revealMines(coord);
         m_game_over = is_mine;
-        m_window->updateWindow(m_board, { m_game_won, m_game_over, false });
+        m_game_window->updateBoard(m_board, { m_game_won, m_game_over, false });
     }
 
     if (m_board.didWin()) {
         m_game_won = true;
-        m_window->updateWindow(m_board, { m_game_won, m_game_over, false });
+        m_game_window->updateBoard(m_board, { m_game_won, m_game_over, false });
     }
 }
 
+void App::deleteAboutWindow() {
+    m_about_window->deleteLater();
+    m_about_window = nullptr;
+}
+
+void App::onActionAbout() {
+    m_about_window = new view::AboutWindow();
+    connect(m_about_window, &view::AboutWindow::finished, this, &App::deleteAboutWindow);
+    m_about_window->exec();
+}
+
+void App::onActionBeginner() {
+    m_settings.row_size = 9;
+    m_settings.col_size = 9;
+    m_settings.num_mines = 10;
+    onRestart();
+}
+
+void App::onActionIntermediate() {
+    m_settings.row_size = 15;
+    m_settings.col_size = 15;
+    m_settings.num_mines = 40;
+    onRestart();
+}
+
+void App::onActionAdvanced() {
+    m_settings.row_size = 16;
+    m_settings.col_size = 30;
+    m_settings.num_mines = 99;
+    onRestart();
+}
+
 void App::onMinimize() {
-    m_window->setWindowState(Qt::WindowMinimized);
+    m_game_window->setWindowState(Qt::WindowMinimized);
 }
 
 void App::onClose() {
