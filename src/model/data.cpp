@@ -11,20 +11,25 @@
 
 namespace {
 
+// Generate a random number in the [lower, upper] interval (inclusive)
 int32_t random_num(int32_t lower_range, int32_t upper_range) {
     assert(upper_range > lower_range);
-    int32_t diff = upper_range - lower_range;
-    int32_t divisor = RAND_MAX / diff;
-    return lower_range + (std::rand() / divisor);
+    double range = upper_range - lower_range;
+    double divisor = RAND_MAX / range;
+    return lower_range + ((double) (std::rand()) / divisor);
 }
 
 } // internal namespace
 
 namespace model {
 
-MineBoard::MineBoard(uint32_t row_num, uint32_t col_num) {
-    LOG_INFO("board: initializing {} by {} board", row_num, col_num);
-    m_board.resize(row_num, std::vector<MineSquare>(col_num));
+MineBoard::MineBoard(const GameSettings& settings) {
+    LOG_INFO("board: initializing {} by {} board", settings.row_size, settings.col_size);
+    m_settings = settings;
+}
+
+void MineBoard::setupBoard() {
+    m_board.resize(m_settings.row_size, std::vector<MineSquare>(m_settings.col_size));
     generateMines();
     countAdjacent();
 }
@@ -127,16 +132,15 @@ bool MineBoard::didWin() const {
 
 void MineBoard::generateMines() {
     std::srand(std::time(nullptr));
-    int32_t max_row = rowSize();
-    int32_t max_col = colSize();
-    
-    for (int32_t i = 0; i < max_row; i++) {
-        for (int32_t j = 0; j < max_col; j++) {
-            if (random_num(1, 8) == 1) {
-                m_board[i][j].is_mine = true;
-                m_board[i][j].adjacent_mines = 0;
-            }
+    for (int32_t i = 0; i < m_settings.num_mines; i++) {
+        int32_t curr_row = random_num(0, rowSize() - 1);
+        int32_t curr_col = random_num(0, colSize() - 1);
+        while (m_board[curr_row][curr_col].is_mine) {
+            curr_row = random_num(0, rowSize() - 1);
+            curr_col = random_num(0, colSize() - 1);
         }
+
+        m_board[curr_row][curr_col].is_mine = true;
     }
 }
 
