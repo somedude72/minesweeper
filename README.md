@@ -13,6 +13,7 @@ the packages listed below using your package manager (apt, homebrew, vcpkg, etc.
 the project:
 
  + Qt6 (required)
+ + Fmt (required)
  + Spdlog (optional)
 
 If you have installed Qt on non-standard paths (e.g. if you used Qt's official installer
