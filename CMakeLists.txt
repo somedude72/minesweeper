@@ -6,14 +6,15 @@
 cmake_minimum_required(VERSION 3.21.1 FATAL_ERROR)
 project(Minesweeper LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
 
 set(TARGET_VERSION 0.0.1)
 set(TARGET_BUILD_NUM 2025.4.30)
-add_compile_definitions(TARGET_VERSION=${TARGET_VERSION}+${TARGET_BUILD_NUM})
+add_compile_definitions(TARGET_VERSION_STRING="${TARGET_VERSION}+${TARGET_BUILD_NUM}")
+
 
 #######################
 ## Project libraries ##
@@ -48,23 +49,17 @@ set(LIBRARIES ${LIBRARIES} fmt::fmt)
 set(SOURCES
     src/main.cpp
     src/app/app.cpp
-    src/model/data.cpp
+    src/model/board.cpp
     src/model/screen.cpp
     src/view/button.cpp
-    src/view/window.cpp
-    src/view/window.ui
-    src/view/about.h
-    src/view/about.cpp
-    src/view/about.ui
+    src/view/game.cpp       src/view/game.ui
+    src/view/about.cpp      src/view/about.ui
+    src/view/options.cpp    src/view/options.ui
 )
 
 ####################
 ## Project assets ##
 ####################
-
-set(INFO_PLIST_IN "assets/macos/info.plist.in")
-set(INFO_PLIST "assets/macos/info.plist")
-configure_file(${INFO_PLIST_IN} ${INFO_PLIST} @ONLY)
 
 set(ASSETS
     assets/board/dead.png
@@ -84,6 +79,7 @@ set(ASSETS
     assets/icon.png
     assets/macos/mac-icon.png
 )
+
 
 #################################
 ## Project include directories ##
@@ -106,7 +102,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBRARIES})
 set_target_properties(${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
-    MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/assets/macos/Info.plist
+    MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/assets/macos/Info.plist.in
 )
 
 set_source_files_properties(${ASSETS}
