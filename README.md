@@ -8,7 +8,7 @@ wrote any lines of unportable code.
 
 ## Building
 
-You will need CMake and a valid C++17 compiler toolchain. You will also need to install
+You will need CMake and a valid C++20 compiler toolchain. You will also need to install
 the packages listed below using your package manager (apt, homebrew, vcpkg, etc.) to build
 the project:
 
