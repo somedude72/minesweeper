@@ -1,15 +1,14 @@
-#include "model/screen.h"
+#include <QGuiApplication>
+#include <QScreen>
+#include <QRect>
 
 #include <algorithm>
-#include <cstdlib>
+#include <cstdint>
 
-namespace model {
+#include "model/screen.h"
 
-int32_t Screen::getMinSize() {
+int32_t minScreenSize() {
     const QRect screen_size = QGuiApplication::primaryScreen()->geometry();
-    return std::min(screen_size.height(), screen_size.width());
+    const int32_t ret = std::min(screen_size.height(), screen_size.width());
+    return ret;
 }
-
-Screen Screen::m_instance = Screen();
-
-} // namespace model

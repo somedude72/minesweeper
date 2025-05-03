@@ -1,24 +1,18 @@
-#include "view/about.h"
 #include <QWidget>
-#include "view/ui_about.h"
+#include <QPixmap>
 
-namespace view {
+#include "view/about.h"
+#include "utils/config.h"
 
-AboutWindow::AboutWindow(QWidget* parent) : QDialog(parent) {
-    m_ui = new Ui::AboutWindow();
+AboutView::AboutView(QWidget* parent) : QDialog(parent) {
+    QPixmap icn = QPixmap(ABOUT_WINDOW_ICON_PATH).scaled(160, 160, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    m_ui = new Ui::AboutWindow;
     m_ui->setupUi(this);
-#if defined(__APPLE__)
-    m_ui->app_logo->setPixmap(QPixmap(":/assets/macos/mac-icon.png").scaled(
-        160, 160, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-#else
-    m_ui->app_logo->setPixmap(QPixmap(":/assets/icon.png").scaled(
-        160, 160, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-#endif
+    m_ui->app_logo->setPixmap(icn);
+    m_ui->copyright->setText(m_ui->copyright->text() + "\n\nVersion " + TARGET_VERSION_STRING);
     layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
-AboutWindow::~AboutWindow() {
+AboutView::~AboutView() {
     delete m_ui;
 }
-
-} // namespace view
