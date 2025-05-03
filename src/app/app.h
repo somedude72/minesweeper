@@ -2,10 +2,10 @@
 
 #include <QApplication>
 
-#include "view/about.h"
-#include "view/window.h"
-#include "model/screen.h"
+#include "view/game.h"
 #include "model/data.h"
+#include "model/board.h"
+#include "model/screen.h"
 
 class App : public QApplication {
 public:
@@ -13,32 +13,37 @@ public:
     ~App();
 
 private:
-    void revealMines(const model::MineCoord& cause);
+    void gameOverRevealMines(const GameBoardCoord& cause);
+    void setupLCD();
 
 private slots:
     void onRestart();
-    void onMark(const model::MineCoord& coord);
-    void onReveal(const model::MineCoord& coord);
+    void onMark(const GameBoardCoord& coord);
+    void onReveal(const GameBoardCoord& coord);
+    void onOptionsChanged(const GameSettings& settings);
 
-    void onClose();
-    void onMinimize();
+    // these functions implement the feature where when you click a number to reveal and
+    // before you lift your mouse button, the surrounding 8 squares flash blank. 
+    void onRevealAltDown(const GameBoardCoord& coord);
+    void onRevealAltUp(const GameBoardCoord& coord);
 
+    void onTimerUpdated();
+
+    void onActionAbout();
     void onActionBeginner();
     void onActionIntermediate();
     void onActionAdvanced();
-    void onActionAbout();
-    void onActionCustom() const;
-    void onActionSetSafeFirstClick(bool safe) const;
+    void onActionOptions() const;
 
-    void deleteAboutWindow();
+    void onClosePressed();
+    void onMinimizePressed();
 
 private:
-    model::MineBoard m_board;
-    model::GameSettings m_settings;
-    view::GameWindow* m_game_window;
-    view::AboutWindow* m_about_window = nullptr;
+    GameSettings m_settings;
+    GameState m_state;
+    GameBoard m_board;
+    GameView* m_game_window = nullptr;
+    QTimer* m_timer = nullptr;
 
-    const int32_t min_size = model::Screen::getMinSize();
-    bool m_game_over, m_game_won;
-
+    const int32_t min_size = minScreenSize();
 };

@@ -1,21 +1,20 @@
 #include <cstdint>
-#include <string>
 
 #include <QApplication>
-#include <QStyle>
+#include <QTimer>
 #include <fmt/format.h>
 
 #include "app/app.h"
+#include "view/game.h"
 #include "view/about.h"
-#include "view/window.h"
-#include "model/data.h"
-
+#include "view/options.h"
+#include "model/board.h"
 #include "utils/config.h"
 
 // {0} = thick border size
 // {1} = thin border size
 // {2} = vertical spacing (control widget)
-static const std::string app_style = R"(
+static constexpr const char* app_style = R"(
 QWidget#root_grid {{
 	border: 0px solid gray;
     border-right: {0}px solid gray;
@@ -54,8 +53,6 @@ QPushButton#ctrl_button_restart {{
 	border-top: {0}px solid white;
 	border-left: {0}px solid white;
     background-color: rgb(205, 205, 205);
-	margin-top: 12px;
-	margin-bottom: 17px;
     color: rgb(0, 0, 0);
 }}
         
@@ -134,131 +131,160 @@ QLabel#window_title {{
     background-color: rgb(245, 245, 245);
     color: black;
 }}
+
+.QLCDNumber {{ 
+    border: 2px rgb(0, 0, 0); 
+    background-color: black; 
+    color: red; 
+}}
 )";
 
 App::App(int argc, char** argv) : QApplication(argc, argv) {
-    SET_LOG_PRIORITY(DEBUG_LEVEL); // this is unused lol
+    SET_LOG_PRIORITY(DEBUG_LEVEL);
     SET_LOG_PATTERN("[%a, %b %d %H:%M:%S] [%l] %v");
-    LOG_INFO("app: logging initiated (this is a test message)");
+    LOG_DEBUG("app: logging initiated (this is a test message)");
 
-    setStyleSheet(QString::fromStdString(fmt::format(app_style,
+    setStyleSheet(QString::fromStdString(fmt::format(
+        app_style,
         min_size / 300,
         min_size / 450,
         min_size / 450
     )));
 
-    m_game_over = false;
-    m_game_won = false;
-
-    m_settings = model::GameSettings();
-    m_board = model::MineBoard(m_settings);
-    m_board.setupBoard();
-    m_game_window = new view::GameWindow(m_board);
+    m_settings = GameSettings();
+    m_state = GameState();
+    m_board = GameBoard(m_settings);
+    m_game_window = new GameView(m_board);
     m_game_window->setWindowFlags(Qt::FramelessWindowHint);
-    m_game_window->initBoard(m_board, { false, false }, true);
+    m_game_window->initBoard(m_board, m_state, true);
     m_game_window->show();
-    
-    connect(m_game_window, &view::GameWindow::restart, this, &App::onRestart);
-    connect(m_game_window, &view::GameWindow::reveal, this, &App::onReveal);
-    connect(m_game_window, &view::GameWindow::mark, this, &App::onMark);
-    connect(m_game_window, &view::GameWindow::actionAbout, this, &App::onActionAbout);
-    connect(m_game_window, &view::GameWindow::actionBeginner, this, &App::onActionBeginner);
-    connect(m_game_window, &view::GameWindow::actionIntermediate, this, &App::onActionIntermediate);
-    connect(m_game_window, &view::GameWindow::actionAdvanced, this, &App::onActionAdvanced);
 
-    connect(m_game_window, &view::GameWindow::close, this, &App::onClose);
-    connect(m_game_window, &view::GameWindow::minimize, this, &App::onMinimize);
+    setupLCD();
+    
+    // registering events (signal/slots)
+    connect(m_game_window, &GameView::restart, this, &App::onRestart);
+    connect(m_game_window, &GameView::reveal, this, &App::onReveal);
+    connect(m_game_window, &GameView::mark, this, &App::onMark);
+    connect(m_game_window, &GameView::actionAbout, this, &App::onActionAbout);
+    connect(m_game_window, &GameView::actionBeginner, this, &App::onActionBeginner);
+    connect(m_game_window, &GameView::actionIntermediate, this, &App::onActionIntermediate);
+    connect(m_game_window, &GameView::actionAdvanced, this, &App::onActionAdvanced);
+    connect(m_game_window, &GameView::actionOptions, this, &App::onActionOptions);
+
+    connect(m_game_window, &GameView::close, this, &App::onClosePressed);
+    connect(m_game_window, &GameView::minimize, this, &App::onMinimizePressed);
 }
 
 App::~App() {
     delete m_game_window;
-    LOG_INFO("app: deallocated window object");
-    LOG_INFO("app: terminating application");
+    LOG_DEBUG("app: deallocated window object");
+    LOG_DEBUG("app: terminated event loop");
 }
 
-void App::revealMines(const model::MineCoord& last_reveal) {
+void App::gameOverRevealMines(const GameBoardCoord& last_reveal) {
     for (int32_t i = 0; i < m_board.rowSize(); i++) {
         for (int32_t j = 0; j < m_board.colSize(); j++) {
             if (!m_board.getSquare({ i, j }).is_mine && !m_board.getSquare({ i, j }).is_marked)
-                continue;
+                continue; // we do not want to do anything with marked mines
             if (i == last_reveal.row && j == last_reveal.col) {
                 m_board.getSquare({ i, j }).is_revealed = true;
                 m_board.getSquare({ i, j }).is_end_reason = true;
             } else if (!m_board.getSquare({ i, j }).is_mine && m_board.getSquare({ i, j }).is_marked) {
-                m_board.getSquare({ i, j }).is_revealed = true; // wrongly marked
+                m_board.getSquare({ i, j }).is_revealed = true; // wrongly marked mine
             } else if (m_board.getSquare({ i, j }).is_mine && !m_board.getSquare({ i, j }).is_marked) {
-                m_board.getSquare({ i, j }).is_revealed = true; // not marked
+                m_board.getSquare({ i, j }).is_revealed = true; // not marked mine
             }
         }
     }
 }
 
+void App::setupLCD() {
+    m_state.timer = 0;
+    m_state.mines = m_settings.num_mines;
+    m_game_window->setMinesLeft(m_state.mines);
+    m_game_window->setTimePassed(m_state.timer);
+    delete m_timer;
+    m_timer = new QTimer(this);
+    m_timer->callOnTimeout(this, &App::onTimerUpdated);
+}
+
+void App::onTimerUpdated() {
+    if (!m_state.won && !m_state.lost) {
+        m_state.timer++;
+        m_game_window->setTimePassed(m_state.timer);
+        m_timer->start(1000);
+    }
+}
+
 void App::onRestart() {
-    LOG_INFO("app: received restart game signal");
-    m_game_over = false;
-    m_game_won = false;
+    m_state.lost = false;
+    m_state.won = false;
+    m_state.is_first_reveal = true;
+    setupLCD();
     if (m_board.rowSize() == m_settings.row_size && m_board.colSize() == m_settings.col_size) {
-        m_board = model::MineBoard(m_settings);
-        m_board.setupBoard();
-        m_game_window->updateBoard(m_board, { m_game_won, m_game_over, false });
+        m_board = GameBoard(m_settings);
+        m_game_window->updateBoard(m_board, m_state);
     } else {
-        m_board = model::MineBoard(m_settings);
-        m_board.setupBoard();
-        m_game_window->initBoard(m_board, { m_game_won, m_game_over, false });
+        m_board = GameBoard(m_settings);
+        m_game_window->initBoard(m_board, m_state);
     }
 }
 
-void App::onMark(const model::MineCoord& coord) {
-    if (m_game_over || m_game_won) {
-        LOG_DEBUG("skipping mark due to game_over || game_won");
+void App::onMark(const GameBoardCoord& coord) {
+    if (m_state.lost || m_state.won || m_board.getSquare(coord).is_revealed)
+        return;
+    if (m_board.getSquare(coord).is_marked) {
+        m_board.getSquare(coord).is_marked = false;
+        m_state.mines++;
+    } else if (m_state.mines != 0) {
+        m_board.getSquare(coord).is_marked = true;
+        m_state.mines--;
+    } else {
         return;
     }
 
-    LOG_INFO("app: received mark signal at ({}, {})", coord.row, coord.col);
-    model::MineSquare& square = m_board.getSquare(coord);
-    if (!square.is_revealed)
-        square.is_marked = !square.is_marked;
-    m_game_window->updateBoard(m_board, { m_game_won, m_game_over, false });
+    m_game_window->updateBoard(m_board, m_state);
+    m_game_window->setMinesLeft(m_state.mines);
 }
 
-void App::onReveal(const model::MineCoord& coord) {
-    if (m_game_over || m_game_won || m_board.getSquare(coord).is_marked) {
-        LOG_DEBUG("skipping reveal due to game_over || game_won || is_marked");
+void App::onReveal(const GameBoardCoord& coord) {
+    if (m_state.lost || m_state.won || m_board.getSquare(coord).is_marked)
         return;
+    if (m_state.is_first_reveal) {
+        m_board.generateMines(coord);
+        m_timer->start(1000);
     }
 
-    LOG_INFO("app: received reveal signal at ({}, {})", coord.row, coord.col);
-    model::MineSquare& square = m_board.getSquare(coord);
-
-    if (square.is_mine) {
-        revealMines(coord);
-        m_game_over = true;
-        m_game_window->updateBoard(m_board, { m_game_won, m_game_over, false });
-    } else if (!square.is_revealed) {
+    if (m_board.getSquare(coord).is_mine) {
+        gameOverRevealMines(coord);
+        m_state.lost = true;
+        m_game_window->updateBoard(m_board, m_state);
+    } else if (!m_board.getSquare(coord).is_revealed) {
         m_board.floodfill(coord);
-        m_game_window->updateBoard(m_board, { m_game_won, m_game_over, false });
+        m_game_window->updateBoard(m_board, m_state);
     } else {
         bool is_mine = m_board.revealAdjacent(coord);
-        if (is_mine) revealMines(coord);
-        m_game_over = is_mine;
-        m_game_window->updateBoard(m_board, { m_game_won, m_game_over, false });
+        if (is_mine) gameOverRevealMines(coord);
+        m_state.lost = is_mine;
+        m_game_window->updateBoard(m_board, m_state);
     }
 
     if (m_board.didWin()) {
-        m_game_won = true;
-        m_game_window->updateBoard(m_board, { m_game_won, m_game_over, false });
+        m_state.won = true;
+        m_game_window->updateBoard(m_board, m_state);
     }
+
+    m_state.is_first_reveal = false;
 }
 
-void App::deleteAboutWindow() {
-    m_about_window->deleteLater();
-    m_about_window = nullptr;
-}
+void App::onRevealAltDown(const GameBoardCoord& coord) { }
+
+void App::onRevealAltUp(const GameBoardCoord& coord) { }
 
 void App::onActionAbout() {
-    m_about_window = new view::AboutWindow();
-    connect(m_about_window, &view::AboutWindow::finished, this, &App::deleteAboutWindow);
-    m_about_window->exec();
+    AboutView* w = new AboutView(m_game_window);
+    w->setAttribute(Qt::WA_DeleteOnClose);
+    w->exec();
 }
 
 void App::onActionBeginner() {
@@ -269,8 +295,8 @@ void App::onActionBeginner() {
 }
 
 void App::onActionIntermediate() {
-    m_settings.row_size = 15;
-    m_settings.col_size = 15;
+    m_settings.row_size = 12;
+    m_settings.col_size = 20;
     m_settings.num_mines = 40;
     onRestart();
 }
@@ -282,10 +308,22 @@ void App::onActionAdvanced() {
     onRestart();
 }
 
-void App::onMinimize() {
+void App::onActionOptions() const {
+    OptionsView* o = new OptionsView(m_settings, m_game_window);
+    connect(o, &OptionsView::applySettings, this, &App::onOptionsChanged);
+    o->setAttribute(Qt::WA_DeleteOnClose);
+    o->exec();
+}
+
+void App::onOptionsChanged(const GameSettings& settings) {
+    m_settings = settings;
+    onRestart();
+}
+
+void App::onMinimizePressed() {
     m_game_window->setWindowState(Qt::WindowMinimized);
 }
 
-void App::onClose() {
-    this->exit(0);
+void App::onClosePressed() {
+    exit(0);
 }

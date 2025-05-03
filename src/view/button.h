@@ -1,37 +1,31 @@
 #pragma once
 
-#include "model/data.h"
 
 #include <QPushButton>
 #include <QMouseEvent>
-#include <QPoint>
 #include <QWidget>
 
-namespace view {
+#include "model/board.h"
 
-// Wrapper class for MineButton that includes a clicked signal
-// that also returns the id of the base object. 
-class MineButton : public QPushButton {
+class ButtonView : public QPushButton {
     Q_OBJECT
 public:
-    MineButton(const model::MineCoord& coord, QWidget* parent = nullptr);
-    void setClickableUi(bool clickable);
+    explicit ButtonView(const GameBoardCoord& coord, QWidget* parent = nullptr);
+    void setClickable(bool clickable);
 
 private slots:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
 
 signals:
-    void enableSurpriseFace() const;
-    void disableSurpriseFace() const;
-    // Signal for when the button is clicked (has id as parameter)
-    void lmbReleased(const model::MineCoord& id) const;
-    void rmbReleased(const model::MineCoord& id) const;
+    // signal when the button is clicked as a number
+    void disableSurprisedFace(const GameBoardCoord& id) const;
+    void enableSurprisedFace(const GameBoardCoord& id) const;
+    // signal when the button is clicked as a regular
+    void lmbReleasedNormal(const GameBoardCoord& id) const;
+    void rmbReleasedNormal(const GameBoardCoord& id) const;
 
 private:
     bool m_clickable;
-    model::MineCoord m_coord;
-
+    GameBoardCoord m_coord;
 };
-
-} // namespace view

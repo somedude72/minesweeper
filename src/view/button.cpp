@@ -1,12 +1,11 @@
-#include "view/button.h"
-#include "model/screen.h"
-#include "model/data.h"
-#include "fmt/format.h"
-
 #include <QPushButton>
 #include <QMouseEvent>
+#include <fmt/format.h>
 
-static const std::string button_style = R"(
+#include "view/button.h"
+#include "model/screen.h"
+
+static constexpr const char* button_style = R"(
 
 /* Regular button styles (non end game) */
 QPushButton#regular {{
@@ -97,39 +96,36 @@ QPushButton#mine_8 {{
 }}
 )";
 
-namespace view {
-
-MineButton::MineButton(const model::MineCoord& coord, QWidget* parent) : QPushButton(parent) {
-    m_clickable = true;
+ButtonView::ButtonView(const GameBoardCoord& coord, QWidget* parent) : QPushButton(parent) {
     m_coord = coord;
-
-    const int32_t border_size = model::Screen::getMinSize() / 300;
-    setStyleSheet(QString::fromStdString(fmt::format(button_style, border_size)));
+    m_clickable = true;
+    setStyleSheet(QString::fromStdString(fmt::format(
+        button_style,
+        minScreenSize() / 300
+    )));
 }
 
-void MineButton::setClickableUi(bool clickable) {
-    m_clickable = clickable;
-}
-
-void MineButton::mousePressEvent(QMouseEvent* event) {
+void ButtonView::mousePressEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton)
-        emit enableSurpriseFace();
-    if (m_clickable)
+        emit disableSurprisedFace(m_coord);
+    if (m_clickable) {
         QPushButton::mousePressEvent(event);
+    }
 }
 
-void MineButton::mouseReleaseEvent(QMouseEvent* event) {
-    emit disableSurpriseFace();
-
+void ButtonView::mouseReleaseEvent(QMouseEvent* event) {
+    emit enableSurprisedFace(m_coord);
     if (!rect().contains(event->pos()))
         return;
     if (event->button() == Qt::RightButton)
-        emit rmbReleased(m_coord);
+        emit rmbReleasedNormal(m_coord);
     if (event->button() == Qt::LeftButton) {
-        emit lmbReleased(m_coord);
+        emit lmbReleasedNormal(m_coord);
     }
 
     QPushButton::mouseReleaseEvent(event);
 }
 
-} // namespace view
+void ButtonView::setClickable(bool clickable) {
+    m_clickable = clickable;
+}
