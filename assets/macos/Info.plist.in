@@ -19,7 +19,7 @@
     <key>CFBundleShortVersionString</key>
     <string>@TARGET_VERSION@</string>
     <key>CFBundleVersion</key>
-    <string>@TARGET_VERSION@+@TARGET_BUILD_NUM@</string>
+    <string>@TARGET_BUILD_NUM@</string>
     <key>NSHumanReadableCopyright</key>
     <string>© 2025 Zichen Qin and other contributors. All rights reserved.</string>
 </dict>
