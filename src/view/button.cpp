@@ -107,20 +107,25 @@ ButtonView::ButtonView(const GameBoardCoord& coord, QWidget* parent) : QPushButt
 
 void ButtonView::mousePressEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton)
-        emit disableSurprisedFace(m_coord);
+        emit lmbPressed(m_coord);
     if (m_clickable) {
         QPushButton::mousePressEvent(event);
     }
 }
 
 void ButtonView::mouseReleaseEvent(QMouseEvent* event) {
-    emit enableSurprisedFace(m_coord);
-    if (!rect().contains(event->pos()))
-        return;
-    if (event->button() == Qt::RightButton)
-        emit rmbReleasedNormal(m_coord);
-    if (event->button() == Qt::LeftButton) {
-        emit lmbReleasedNormal(m_coord);
+    if (!rect().contains(event->pos())) {
+        if (event->button() == Qt::RightButton)
+            emit rmbReleased(m_coord);
+        if (event->button() == Qt::LeftButton) {
+            emit lmbReleasedOutside(m_coord);
+        }
+    } else {
+        if (event->button() == Qt::RightButton)
+            emit rmbReleased(m_coord);
+        if (event->button() == Qt::LeftButton) {
+            emit lmbReleasedInside(m_coord);
+        }
     }
 
     QPushButton::mouseReleaseEvent(event);
