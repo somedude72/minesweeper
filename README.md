@@ -4,7 +4,9 @@
   <img width="530" alt="Minesweeper 9x20" src="https://github.com/user-attachments/assets/d5882c0e-1d10-4642-8d96-a34ec21d56f3" />
 </p>
 
-This is a cross-platform project written using Qt/C++ to replicate the classic minesweeper game on Windows 95. The game supports custom board sizes and mine counts, safe first reveal, and clear first reveal. More features may or may not be implemented in future updates. 
+This is a cross-platform project written using Qt/C++ to replicate the classic minesweeper
+game on Windows 95. The game supports custom board sizes and mine counts, safe first
+reveal, and clear first reveal, custom seeds, and more. 
 
 ## Building
 
@@ -23,7 +25,7 @@ by the following steps.
 
 ```bash
 # On debian-linux distributions you can use the following command
-$ sudo apt install qt6-base-dev libspdlog-dev
+$ sudo apt install qt6-base-dev libspdlog-dev libfmt-dev
 ```
 
  + Clone the repository using git
