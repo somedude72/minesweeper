@@ -14,9 +14,9 @@ public:
 private:
     void enableMineCountWarning();
     void disableMineCountWarning();
-    bool isValidMineCount();
-    int32_t maxMineCount();
 
+    int32_t maxMineCount();
+    bool isValidMineCount();
     void checkValidMineCount();
 
 protected:
@@ -30,9 +30,12 @@ private slots:
     void onRowEditorChanged();
     void onColEditorChanged();
     void onMineEditorChanged();
-
-    void onSafeChanged(Qt::CheckState value);
-    void onClearChanged(Qt::CheckState value);
+    void onSeedEditorChanged();
+    
+    void onSafeCheckChanged(Qt::CheckState value);
+    void onClearCheckChanged(Qt::CheckState value);
+    void onMarkCheckChanged(Qt::CheckState value);
+    void onSeedCheckChanged(Qt::CheckState value);
     void onDone();
 
 signals:
