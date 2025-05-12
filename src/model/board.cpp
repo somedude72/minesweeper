@@ -26,6 +26,8 @@ namespace {
 }
 
 GameBoard::GameBoard(const GameSettings& settings) : m_settings(settings) {
+    m_settings = settings;
+    std::srand(std::time(nullptr)); // seed generation
     m_board.assign(m_settings.row_size, std::vector<GameBoardSquare>(
         m_settings.col_size, 
         GameBoardSquare()
@@ -33,42 +35,188 @@ GameBoard::GameBoard(const GameSettings& settings) : m_settings(settings) {
 }
 
 void GameBoard::generateMines(const GameBoardCoord& init) {
-    generateMinesImpl(init);
+    generateMinesImpl(init, m_settings.seed);
     countAdjacent();
 }
 
-void GameBoard::floodfill(const GameBoardCoord& start) {
-    std::queue<GameBoardCoord> queue;
-    queue.push(start);
+void GameBoard::updateSettings(const GameSettings& new_settings) {
+    m_settings = new_settings;
+}
 
-    while (!queue.empty()) {
-        GameBoardCoord curr = queue.front();
-        m_board[curr.row][curr.col].is_revealed = true;
-        queue.pop();
-        constexpr int dir_row[8] = { -1, -1, -1, 0, 0, 1, 1, 1 };
-        constexpr int dir_col[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
-
-        if (m_board[curr.row][curr.col].adjacent_mines)
-            continue;
-        for (int32_t i = 0; i < 8; i++) {
-            int32_t new_row = curr.row + dir_row[i];
-            int32_t new_col = curr.col + dir_col[i];
-            if (new_row < 0 || new_col < 0 || new_row >= rowSize() || new_col >= colSize())
-                continue;
-            if (m_board[new_row][new_col].is_mine || m_board[new_row][new_col].is_revealed)
-                continue;
-            if (m_board[new_row][new_col].is_marked)
-                continue;
-            m_board[new_row][new_col].is_revealed = true;
-            queue.push({ new_row, new_col });
+void GameBoard::gameOverRevealMines(const GameBoardCoord& last_reveal) {
+    for (int32_t i = 0; i < rowSize(); i++) {
+        for (int32_t j = 0; j < colSize(); j++) {
+            if (!m_board[i][j].is_mine && !m_board[i][j].is_marked)
+                continue; // we do not want to do anything with marked mines
+            if (i == last_reveal.row && j == last_reveal.col) {
+                m_board[i][j].is_revealed = true;
+                m_board[i][j].is_end_reason = true;
+            } else if (!m_board[i][j].is_mine && m_board[i][j].is_marked) {
+                m_board[i][j].is_revealed = true; // wrongly marked mine
+            } else if (m_board[i][j].is_mine && !m_board[i][j].is_marked) {
+                m_board[i][j].is_revealed = true; // not marked mine
+            }
         }
     }
 }
 
-bool GameBoard::revealAdjacent(const GameBoardCoord& coord) {
+void GameBoard::gameWonMarkMines() {
+    for (int32_t i = 0; i < m_board.size(); i++) {
+        for (int32_t j = 0; j < m_board[0].size(); j++) {
+            if (m_board[i][j].is_mine) {
+                m_board[i][j].is_marked = true;
+            }
+        }
+    }
+}
+
+void GameBoard::mark(const GameBoardCoord& coord, GameState& state) {
+    GameBoardSquare& square = m_board[coord.row][coord.col];
+    if (state.lost || state.won || square.is_revealed)
+        return;
+    if (m_settings.is_question_enabled) {
+        if (square.is_marked) {
+            square.is_marked = false;
+            square.is_question = true;
+            state.mines++;
+        } else if (square.is_question) {
+            square.is_question = false;
+        } else {
+            square.is_marked = true;
+            state.mines--;
+        }
+    } else {
+        if (square.is_marked) {
+            square.is_marked = false;
+            state.mines++;
+        } else {
+            square.is_marked = true;
+            state.mines--;
+        }
+    }
+}
+
+void GameBoard::reveal(const GameBoardCoord& coord, GameState& state) {
+    if (state.lost || state.won || m_board[coord.row][coord.col].is_marked)
+        return;
+    if (m_board[coord.row][coord.col].is_mine) {
+        state.lost = true;
+        gameOverRevealMines(coord);
+    } else if (!m_board[coord.row][coord.col].is_revealed) {
+        floodfillImpl(coord);
+    } else if (revealAdjacentImpl(coord)) {
+        gameOverRevealMines(coord);
+        state.lost = true;
+    }
+
+    if (didWin()) {
+        gameWonMarkMines();
+        state.won = true;
+    }
+
+    state.is_first_reveal = false;
+}
+
+void GameBoard::reset(const GameSettings& settings) {
+    m_settings = settings;
+    m_board.assign(m_settings.row_size, std::vector<GameBoardSquare>(
+        m_settings.col_size, 
+        GameBoardSquare()
+    ));
+}
+
+void GameBoard::revealAdjacentUp() {
+    if (!m_internal_copy.empty()) {
+        m_board = m_internal_copy;
+        m_internal_copy = {};
+    }
+}
+
+void GameBoard::revealAdjacentDown(const GameBoardCoord& coord) {
+    const GameBoardSquare& square = m_board[coord.row][coord.col];
+    if (!square.is_revealed || !square.adjacent_mines)
+        return;
+
+    m_internal_copy = m_board;
+    constexpr int dir_row[8] = { -1, -1, -1, 0, 0, 1, 1, 1 };
+    constexpr int dir_col[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
+    for (int32_t i = 0; i < 8; i++) {
+        const int32_t new_row = coord.row + dir_row[i];
+        const int32_t new_col = coord.col + dir_col[i];
+        GameBoardSquare& sq = m_board[new_row][new_col];
+        if (!isValid(new_row, new_col, rowSize(), colSize()))
+            continue;
+        if (!sq.is_marked && !sq.is_revealed) {
+            sq.is_revealed = true;
+            sq.is_mine = false;
+            sq.adjacent_mines = 0;
+        }
+    }
+}
+
+const GameBoardSquare& GameBoard::getSquare(const GameBoardCoord& get_coord) const {
+    return m_board[get_coord.row][get_coord.col];
+}
+
+GameBoardSquare& GameBoard::getSquare(const GameBoardCoord& get_coord) {
+    return m_board[get_coord.row][get_coord.col];
+}
+
+uint32_t GameBoard::getSeed() const {
+    return m_settings.seed;
+}
+
+int32_t GameBoard::rowSize() const {
+    return m_board.size();
+}
+
+int32_t GameBoard::colSize() const {
+    return m_board[0].size();
+}
+
+namespace {
+
+    // whether or a coordinate is a valid spot to generate a mine if the safe first click
+    bool isOutsideSafeZone(int32_t row, int32_t col, int32_t reveal_row, int32_t reveal_col) {
+        return row != reveal_row || col != reveal_col;
+    }
+
+    bool isOutsideClearZone(int32_t row, int32_t col, int32_t reveal_row, int32_t reveal_col) {
+        return std::abs(reveal_row - row) > 1 || std::abs(reveal_col - col) > 1;
+    }
+
+    bool alwaysValid(int32_t, int32_t, int32_t, int32_t) {
+        return true;
+    }
+
+}
+
+void GameBoard::generateMinesImpl(const GameBoardCoord& guarantee, uint32_t seed) {
+    m_settings.seed = (seed == UINT32_MAX) ? std::rand() : seed;
+    std::mt19937 engine(m_settings.seed);
+
+    bool (*validCondition)(int32_t, int32_t, int32_t, int32_t) = alwaysValid;
+    if (m_settings.is_safe_first_move)
+        validCondition = isOutsideSafeZone;
+    if (m_settings.is_clear_first_move)
+        validCondition = isOutsideClearZone;
+
+    for (int32_t i = 0; i < m_settings.num_mines; i++) {
+        int32_t curr_row = randomNum(0, rowSize() - 1, engine);
+        int32_t curr_col = randomNum(0, colSize() - 1, engine);
+        while (m_board[curr_row][curr_col].is_mine || !validCondition(curr_row, curr_col, guarantee.row, guarantee.col)) {
+            curr_row = randomNum(0, rowSize() - 1, engine);
+            curr_col = randomNum(0, colSize() - 1, engine);
+        }
+
+        m_board[curr_row][curr_col].is_mine = true;
+    }
+}
+
+bool GameBoard::revealAdjacentImpl(const GameBoardCoord& coord) {
+    revealAdjacentUp();
     bool is_mine = false;
     int flag_nums = 0;
-
     constexpr int dir_row[8] = { -1, -1, -1, 0, 0, 1, 1, 1 };
     constexpr int dir_col[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
     for (int i = 0; i < 8; i++) {
@@ -96,46 +244,11 @@ bool GameBoard::revealAdjacent(const GameBoardCoord& coord) {
         } else if (is_mine) {
             m_board[new_row][new_col].is_revealed = true;
         } else {
-            floodfill({ new_row, new_col });
+            floodfillImpl({ new_row, new_col });
         }
     }
     
     return is_mine;
-}
-
-namespace {
-
-    // whether or a coordinate is a valid spot to generate a mine if the safe first click
-    bool isValidSafeMine(int32_t row, int32_t col, int32_t reveal_row, int32_t reveal_col) {
-        return row != reveal_row || col != reveal_col;
-    }
-
-    bool isValidClearMine(int32_t row, int32_t col, int32_t reveal_row, int32_t reveal_col) {
-        return std::abs(reveal_row - row) > 1 || std::abs(reveal_col - col) > 1;
-    }
-
-}
-
-void GameBoard::generateMinesImpl(const GameBoardCoord& guarantee) {
-    std::random_device rd;
-    std::mt19937 mt(rd());
-
-    bool (*validCondition)(int32_t, int32_t, int32_t, int32_t);
-    if (m_settings.is_safe_first_move)
-        validCondition = isValidSafeMine;
-    if (m_settings.is_clear_first_move)
-        validCondition = isValidClearMine;
-
-    for (int32_t i = 0; i < m_settings.num_mines; i++) {
-        int32_t curr_row = randomNum(0, rowSize() - 1, mt);
-        int32_t curr_col = randomNum(0, colSize() - 1, mt);
-        while (m_board[curr_row][curr_col].is_mine || !validCondition(curr_row, curr_col, guarantee.row, guarantee.col)) {
-            curr_row = randomNum(0, rowSize() - 1, mt);
-            curr_col = randomNum(0, colSize() - 1, mt);
-        }
-
-        m_board[curr_row][curr_col].is_mine = true;
-    }
 }
 
 void GameBoard::countAdjacent() {
@@ -159,20 +272,32 @@ void GameBoard::countAdjacent() {
     }
 }
 
-const GameBoardSquare& GameBoard::getSquare(const GameBoardCoord& get_coord) const {
-    return m_board[get_coord.row][get_coord.col];
-}
+void GameBoard::floodfillImpl(const GameBoardCoord& start) {
+    std::queue<GameBoardCoord> queue;
+    queue.push(start);
 
-GameBoardSquare& GameBoard::getSquare(const GameBoardCoord& get_coord) {
-    return m_board[get_coord.row][get_coord.col];
-}
+    while (!queue.empty()) {
+        GameBoardCoord curr = queue.front();
+        m_board[curr.row][curr.col].is_revealed = true;
+        queue.pop();
+        constexpr int dir_row[8] = { -1, -1, -1, 0, 0, 1, 1, 1 };
+        constexpr int dir_col[8] = { -1, 0, 1, -1, 1, -1, 0, 1 };
 
-int32_t GameBoard::rowSize() const {
-    return m_board.size();
-}
-
-int32_t GameBoard::colSize() const {
-    return m_board[0].size();
+        if (m_board[curr.row][curr.col].adjacent_mines)
+            continue;
+        for (int32_t i = 0; i < 8; i++) {
+            int32_t new_row = curr.row + dir_row[i];
+            int32_t new_col = curr.col + dir_col[i];
+            if (new_row < 0 || new_col < 0 || new_row >= rowSize() || new_col >= colSize())
+                continue;
+            if (m_board[new_row][new_col].is_mine || m_board[new_row][new_col].is_revealed)
+                continue;
+            if (m_board[new_row][new_col].is_marked)
+                continue;
+            m_board[new_row][new_col].is_revealed = true;
+            queue.push({ new_row, new_col });
+        }
+    }
 }
 
 bool GameBoard::didWin() const {
