@@ -50,7 +50,6 @@ set(SOURCES
     src/main.cpp
     src/app/app.cpp
     src/model/board.cpp
-    src/model/screen.cpp
     src/view/button.cpp
     src/view/game.cpp       src/view/game.ui
     src/view/about.cpp      src/view/about.ui
