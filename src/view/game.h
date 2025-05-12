@@ -34,9 +34,17 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
 
+private:
+    void setupMenu();
+    void setupFontAndIcons();
+    void updateControlIcon(const GameState& state) const;
+    void renderButton(const GameBoardSquare& square, const GameState& new_state, ButtonView* button_view) const;
+    void clearBoard();
+
 private slots:
-    void onEnableSurpriseFace(const GameBoardCoord& coord);
-    void onDisableSurpriseFace(const GameBoardCoord& coord);
+    void onLmbPressed(const GameBoardCoord& coord);
+    void onLmbReleasedInside(const GameBoardCoord& coord);
+    void onLmbReleasedOutside(const GameBoardCoord& coord);
 
     // game slots
     void onRestart() const;
@@ -61,6 +69,9 @@ signals:
     void reveal(const GameBoardCoord& coord) const;
     void mark(const GameBoardCoord& coord) const;
 
+    void revealAltDown(const GameBoardCoord& coord) const;
+    void revealAltUp(const GameBoardCoord& coord) const;
+
     void actionBeginner() const;
     void actionIntermediate() const;
     void actionAdvanced() const;
@@ -71,13 +82,6 @@ signals:
 
     void close() const;
     void minimize() const;
-
-private:
-    void setupMenu();
-    void setupFontAndIcons();
-    void clearBoard();
-    void updateControlIcon(const GameState& state) const;
-    void renderButton(const GameBoardSquare& square, const GameState& new_state, ButtonView* button_view) const;
 
 private:
     GameState m_prev_state = { false, false, false };

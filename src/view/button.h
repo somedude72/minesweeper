@@ -19,11 +19,11 @@ private slots:
 
 signals:
     // signal when the button is clicked as a number
-    void disableSurprisedFace(const GameBoardCoord& id) const;
-    void enableSurprisedFace(const GameBoardCoord& id) const;
+    void lmbPressed(const GameBoardCoord& id) const;
     // signal when the button is clicked as a regular
-    void lmbReleasedNormal(const GameBoardCoord& id) const;
-    void rmbReleasedNormal(const GameBoardCoord& id) const;
+    void lmbReleasedInside(const GameBoardCoord& id) const;
+    void lmbReleasedOutside(const GameBoardCoord& id) const;
+    void rmbReleased(const GameBoardCoord& id) const;
 
 private:
     bool m_clickable;
