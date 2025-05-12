@@ -59,7 +59,6 @@ void GameView::setupFontAndIcons() {
 void GameView::setupMenu() {
     QMenu* game_menu_inner = new QMenu(this);
     game_menu_inner->addAction(action_new_game);
-    game_menu_inner->addAction(action_about);
     game_menu_inner->addSeparator();
     game_menu_inner->addAction(action_beginner);
     game_menu_inner->addAction(action_intermediate);
@@ -69,7 +68,6 @@ void GameView::setupMenu() {
     menu_game->setMenu(game_menu_inner);
     
     connect(action_new_game, &QAction::triggered, this, &GameView::onRestart);
-    connect(action_about, &QAction::triggered, this, &GameView::onActionAbout);
     connect(action_beginner, &QAction::triggered, this, &GameView::onActionBeginner);
     connect(action_intermediate, &QAction::triggered, this, &GameView::onActionIntermediate);
     connect(action_expert, &QAction::triggered, this, &GameView::onActionAdvanced);
@@ -78,10 +76,13 @@ void GameView::setupMenu() {
     QMenu* help_menu_inner = new QMenu(this);
     help_menu_inner->addAction(action_tutorial);
     help_menu_inner->addAction(action_github);
+    help_menu_inner->addSeparator();
+    help_menu_inner->addAction(action_about);
     menu_help->setMenu(help_menu_inner);
 
     connect(action_tutorial, &QAction::triggered, this, &GameView::onActionTutorial);
     connect(action_github, &QAction::triggered, this, &GameView::onActionGithub);
+    connect(action_about, &QAction::triggered, this, &GameView::onActionAbout);
 
     menu_bar->layout()->setContentsMargins(6, m_min_size / 450, 12, 0);
 }
@@ -121,7 +122,9 @@ void GameView::initBoard(const GameBoard& board, const GameState& state, bool fi
     clearBoard();
     m_buttons.assign(board.rowSize(), std::vector<ButtonView*>(board.colSize(), nullptr));
     for (int32_t i = 0; i < board.rowSize(); i++) {
+        // we have to set minimum row height because qt is weird
         board_widget_layout->setRowMinimumHeight(i, 26 - 2 * std::log(board.rowSize()));
+
         for (int32_t j = 0; j < board.colSize(); j++) {
             m_buttons[i][j] = new ButtonView({ i, j }, board_widget);
             const int32_t btn_size = 30 - 2 * std::log(board.rowSize());
@@ -129,11 +132,11 @@ void GameView::initBoard(const GameBoard& board, const GameState& state, bool fi
             m_buttons[i][j]->setFixedSize(btn_size, btn_size);
             m_buttons[i][j]->setIconSize(QSize(icon_size, icon_size));
             m_buttons[i][j]->setFont(QFont(m_board_font, m_min_size / 85));
-
-            connect(m_buttons[i][j], &ButtonView::disableSurprisedFace, this, &GameView::onEnableSurpriseFace);
-            connect(m_buttons[i][j], &ButtonView::enableSurprisedFace, this, &GameView::onDisableSurpriseFace);
-            connect(m_buttons[i][j], &ButtonView::rmbReleasedNormal, this, &GameView::onMark);
-            connect(m_buttons[i][j], &ButtonView::lmbReleasedNormal, this, &GameView::onReveal);
+            connect(m_buttons[i][j], &ButtonView::lmbReleasedInside, this, &GameView::onReveal);
+            connect(m_buttons[i][j], &ButtonView::lmbReleasedInside, this, &GameView::onLmbReleasedInside);
+            connect(m_buttons[i][j], &ButtonView::lmbReleasedOutside, this, &GameView::onLmbReleasedOutside);
+            connect(m_buttons[i][j], &ButtonView::lmbPressed, this, &GameView::onLmbPressed);
+            connect(m_buttons[i][j], &ButtonView::rmbReleased, this, &GameView::onMark);
             board_widget_layout->addWidget(m_buttons[i][j], i, j);
         }
     }
@@ -146,6 +149,7 @@ void GameView::initBoard(const GameBoard& board, const GameState& state, bool fi
 void GameView::renderButton(const GameBoardSquare& square, const GameState& new_state, ButtonView* button) const {
     const bool square_revealed = square.is_revealed;
     const bool square_marked = square.is_marked;
+    const bool square_question = square.is_question;
     const bool square_has_adj = square.adjacent_mines;
     const bool square_is_mine = square.is_mine;
     const bool square_is_end_reason = square.is_end_reason;
@@ -154,7 +158,7 @@ void GameView::renderButton(const GameBoardSquare& square, const GameState& new_
     if (!square_revealed) {
         button->setObjectName("regular");
         button->setIcon(square_marked ? m_flag : m_no_icon);
-        button->setText("");
+        button->setText(square_question ? "?" : "");
         button->setDisabled(false);
         button->setClickable(new_state.lost || new_state.won || square_marked ? false : true);
     } else if (square_revealed) {
@@ -221,18 +225,26 @@ void GameView::onActionGithub() const {
     emit actionGithub();
 }
 
-void GameView::onEnableSurpriseFace(const GameBoardCoord& coord) {
+void GameView::onLmbPressed(const GameBoardCoord& coord) {
     if (!m_prev_state.won && !m_prev_state.lost) {
         m_prev_state.revealing_mine = true;
         updateControlIcon(m_prev_state);
+        emit revealAltDown(coord);
     }
 }
 
-void GameView::onDisableSurpriseFace(const GameBoardCoord& coord) {
+void GameView::onLmbReleasedInside(const GameBoardCoord& coord) {
     if (!m_prev_state.won && !m_prev_state.lost) {
         m_prev_state.revealing_mine = false;
         updateControlIcon(m_prev_state);
+        emit revealAltUp(coord);
     }
+}
+
+void GameView::onLmbReleasedOutside(const GameBoardCoord& coord) {
+    m_prev_state.revealing_mine = false;
+    updateControlIcon(m_prev_state);
+    emit revealAltUp(coord);
 }
 
 void GameView::onActionBeginner() const {

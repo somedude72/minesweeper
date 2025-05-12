@@ -13,8 +13,12 @@ public:
     ~App();
 
 private:
-    void gameOverRevealMines(const GameBoardCoord& cause);
     void setupLCD();
+    
+    void gameOverRevealMines(const GameBoardCoord& cause);
+    void gameWonMarkMines();
+    void markNoQuestionImpl(const GameBoardCoord& coord);
+    void markYesQuestionImpl(const GameBoardCoord& coord);
 
 private slots:
     void onRestart();
@@ -23,7 +27,8 @@ private slots:
     void onOptionsChanged(const GameSettings& settings);
 
     // these functions implement the feature where when you click a number to reveal and
-    // before you lift your mouse button, the surrounding 8 squares flash blank. 
+    // before you lift your mouse button, the surrounding 8 squares flash blank. these are
+    // visual changes only
     void onRevealAltDown(const GameBoardCoord& coord);
     void onRevealAltUp(const GameBoardCoord& coord);
 
