@@ -5,8 +5,8 @@
 </p>
 
 This is a cross-platform project written using Qt/C++ to replicate the classic minesweeper
-game on Windows 95. The game supports custom board sizes and mine counts, safe first
-reveal, and clear first reveal, custom seeds, and more. 
+game on Windows 95. The game supports custom board sizes and mine counts, safe/clear first
+reveal, custom seeds, and more. 
 
 ## Building
 
