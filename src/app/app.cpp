@@ -1,5 +1,7 @@
 #include <QApplication>
+#include <QDesktopServices>
 #include <QTimer>
+#include <QUrl>
 #include <fmt/format.h>
 
 #include "app/app.h"
@@ -154,6 +156,9 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
     )));
 
     m_settings = GameSettings();
+    std::srand(std::time(nullptr)); // seed generation
+    m_settings.seed = (m_settings.is_set_seed) ? m_settings.seed : std::rand();
+
     m_state = GameState();
     m_board = GameBoard(m_settings);
     m_game_window = new GameView(m_board);
@@ -174,6 +179,8 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
     connect(m_game_window, &GameView::actionIntermediate, this, &App::onActionIntermediate);
     connect(m_game_window, &GameView::actionAdvanced, this, &App::onActionAdvanced);
     connect(m_game_window, &GameView::actionOptions, this, &App::onActionOptions);
+    connect(m_game_window, &GameView::actionGithub, this, &App::onActionGithub);
+    connect(m_game_window, &GameView::actionTutorial, this, &App::onActionTutorial);
 
     connect(m_game_window, &GameView::close, this, &App::onClosePressed);
     connect(m_game_window, &GameView::minimize, this, &App::onMinimizePressed);
@@ -209,6 +216,7 @@ void App::onRestart() {
     m_state.won = false;
     m_state.revealing_mine = false;
     m_state.is_first_reveal = true;
+    m_settings.seed = (m_settings.is_set_seed) ? m_settings.seed : std::rand();
 
     if (m_board.rowSize() == m_settings.row_size
         && m_board.colSize() == m_settings.col_size) {
@@ -274,6 +282,14 @@ void App::onActionOptions() const {
     connect(window, &OptionsView::applySettings, this, &App::onOptionsChanged);
     window->setAttribute(Qt::WA_DeleteOnClose); // makes it so that we don't have to manually
     window->exec();                             // delete the window after it closes
+}
+
+void App::onActionGithub() const {
+    QDesktopServices::openUrl(QUrl("https://github.com/somedude72/minesweeper"));
+}
+
+void App::onActionTutorial() const {
+    
 }
 
 void App::onActionAbout() {
