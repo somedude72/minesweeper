@@ -289,7 +289,7 @@ void App::onActionGithub() const {
 }
 
 void App::onActionTutorial() const {
-    
+    QDesktopServices::openUrl(QUrl("https://github.com/somedude72/minesweeper/blob/main/docs/tutorial.md"));
 }
 
 void App::onActionAbout() {
