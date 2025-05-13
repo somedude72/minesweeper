@@ -1,7 +1,7 @@
 ## Minesweeper
 <p float="left">
-  <img width="253" alt="Minesweeper 9x9" src="https://github.com/user-attachments/assets/c3afc35f-e22a-4aae-b897-0236ca617380" />
-  <img width="530" alt="Minesweeper 9x20" src="https://github.com/user-attachments/assets/d5882c0e-1d10-4642-8d96-a34ec21d56f3" />
+  <img width="253" alt="Minesweeper 9x9" src="https://raw.githubusercontent.com/somedude72/minesweeper/refs/heads/main/docs/dead-9x9.png" />
+  <img width="530" alt="Minesweeper 9x20" src="https://raw.githubusercontent.com/somedude72/minesweeper/refs/heads/main/docs/dead-9x20.png" />
 </p>
 
 This is a cross-platform project written using Qt/C++ to replicate the classic minesweeper
