@@ -48,7 +48,7 @@ private:
     // them, starting from the start coordinate. note that this function will not
     // check if the row/col to start revealing at is a mine.
     void floodfillImpl(const GameBoardCoord& start);
-    void generateMinesImpl(const GameBoardCoord& guarantee, uint32_t seed); 
+    void generateMinesImpl(const GameBoardCoord& guarantee); 
     bool revealAdjacentImpl(const GameBoardCoord& coord);
     void countAdjacent(); 
 

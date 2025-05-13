@@ -39,6 +39,8 @@ private slots:
     void onActionIntermediate();
     void onActionAdvanced();
     void onActionOptions() const;
+    void onActionGithub() const;
+    void onActionTutorial() const;
 
     void onClosePressed();
     void onMinimizePressed();
