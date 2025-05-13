@@ -51,3 +51,11 @@ redistributable application bundle or an application folder, you may have to use
 [`macdeployqt`](https://doc.qt.io/qt-6/macos-deployment.html#frameworks) or
 [`windeployqt`](https://doc.qt.io/qt-6/macos-deployment.html#frameworks) tool for the
 respective platforms to copy the libraries into the bundle. 
+
+## Support
+
+If you encounter any issues or crashes, please file a bug report at the [issues
+tracker](https://github.com/somedude72/minesweeper/issues). Please include a clear
+description of the bug, steps to reproduce, and system information in your report. 
+
+Consider starring this repository to support this project.
