@@ -21,6 +21,7 @@ struct GameSettings {
     bool is_question_enabled = false;
     bool is_safe_first_move = true;
     bool is_clear_first_move = false;
+    bool is_set_seed = false;
 };
 
 struct GameStatistics {
