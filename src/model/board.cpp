@@ -27,7 +27,6 @@ namespace {
 
 GameBoard::GameBoard(const GameSettings& settings) : m_settings(settings) {
     m_settings = settings;
-    std::srand(std::time(nullptr)); // seed generation
     m_board.assign(m_settings.row_size, std::vector<GameBoardSquare>(
         m_settings.col_size, 
         GameBoardSquare()
@@ -35,7 +34,7 @@ GameBoard::GameBoard(const GameSettings& settings) : m_settings(settings) {
 }
 
 void GameBoard::generateMines(const GameBoardCoord& init) {
-    generateMinesImpl(init, m_settings.seed);
+    generateMinesImpl(init);
     countAdjacent();
 }
 
@@ -191,8 +190,7 @@ namespace {
 
 }
 
-void GameBoard::generateMinesImpl(const GameBoardCoord& guarantee, uint32_t seed) {
-    m_settings.seed = (seed == UINT32_MAX) ? std::rand() : seed;
+void GameBoard::generateMinesImpl(const GameBoardCoord& guarantee) {
     std::mt19937 engine(m_settings.seed);
 
     bool (*validCondition)(int32_t, int32_t, int32_t, int32_t) = alwaysValid;

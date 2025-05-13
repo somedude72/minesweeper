@@ -33,15 +33,9 @@ OptionsView::OptionsView(const GameSettings& settings, QWidget* parent) : QDialo
     m_ui->safe_checkbox->setChecked(m_settings.is_safe_first_move);
     m_ui->mark_checkbox->setChecked(m_settings.is_question_enabled);
     
-    if (m_settings.seed == -1) {
-        m_ui->seed_editor->setText("");
-        m_ui->seed_editor->setDisabled(true);
-        m_ui->seed_check->setChecked(false);
-    } else {
-        m_ui->seed_editor->setText(QString::number(m_settings.seed));
-        m_ui->seed_editor->setDisabled(false);
-        m_ui->seed_check->setChecked(true);
-    }
+    m_ui->seed_editor->setText(QString::number(m_settings.seed));
+    m_ui->seed_editor->setEnabled(m_settings.is_set_seed);
+    m_ui->seed_check->setChecked(m_settings.is_set_seed);
 
     layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
@@ -207,12 +201,12 @@ void OptionsView::onMarkCheckChanged(Qt::CheckState value) {
 
 void OptionsView::onSeedCheckChanged(Qt::CheckState value) {
     if (value == Qt::CheckState::Checked) {
+        m_settings.is_set_seed = true;
         m_ui->seed_editor->setDisabled(false);
         onSeedEditorChanged();
     } else {
+        m_settings.is_set_seed = false;
         m_ui->seed_editor->setDisabled(true);
-        m_ui->seed_editor->setText("");
-        m_settings.seed = -1;
     }
 }
 
