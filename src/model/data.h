@@ -24,6 +24,7 @@ struct GameSettings {
     bool is_set_seed = false;
 };
 
+// TODO: Implement
 struct GameStatistics {
     double best_time_all;
     double best_time_easy;
@@ -49,6 +50,7 @@ struct GameStatistics {
     double play_time;
 };
 
+// TODO: Implement settings/game data save and reload mechanic
 class GameDataManager {
 public:
     GameDataManager();

@@ -14,7 +14,7 @@
 // {0} = thick border size
 // {1} = thin border size
 // {2} = vertical spacing (control widget)
-static constexpr const char* app_style = R"(
+static constexpr const char* s_app_style = R"(
 QWidget#root_grid {{
 	border: 0px solid gray;
     border-right: {0}px solid gray;
@@ -149,7 +149,7 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
     LOG_DEBUG("app: logging initiated (this is a test message)");
 
     setStyleSheet(QString::fromStdString(fmt::format(
-        app_style,
+        s_app_style,
         min_size / 300,
         min_size / 450,
         min_size / 450
