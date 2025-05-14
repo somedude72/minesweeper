@@ -11,7 +11,7 @@
 #include "model/data.h"
 #include "model/screen.h"
 
-class GameView : public QMainWindow, private Ui::GameWindow {
+class GameView : public QMainWindow {
     Q_OBJECT
 public:
     GameView() = default;
@@ -84,6 +84,7 @@ signals:
     void minimize() const;
 
 private:
+    Ui::GameWindow* m_ui;
     GameState m_prev_state = { false, false, false };
     GameBoard m_prev_board = GameBoard();
     

@@ -20,13 +20,15 @@
 #include "utils/config.h"
 
 GameView::GameView(const GameBoard& init_board, QWidget* parent) : QMainWindow(parent) {
-    setupUi(this);
+    m_ui = new Ui::GameWindow();
+
+    m_ui->setupUi(this);
     setupMenu();
     setupFontAndIcons();
     
-    connect(window_close, &QPushButton::clicked, this, &GameView::onClose);
-    connect(window_min, &QPushButton::clicked, this, &GameView::onMinimize);
-    connect(ctrl_button_restart, &QPushButton::clicked, this, &GameView::onRestart);
+    connect(m_ui->window_close, &QPushButton::clicked, this, &GameView::onClose);
+    connect(m_ui->window_min, &QPushButton::clicked, this, &GameView::onMinimize);
+    connect(m_ui->ctrl_button_restart, &QPushButton::clicked, this, &GameView::onRestart);
 }
 
 void GameView::setupFontAndIcons() {
@@ -36,20 +38,20 @@ void GameView::setupFontAndIcons() {
     m_window_font = QFontDatabase::applicationFontFamilies(window_font_id).at(0);
     m_board_font = QFontDatabase::applicationFontFamilies(board_font_id).at(0);
 
-    window_close->setIcon(QIcon(":/assets/window/close.png"));
-    window_min->setIcon(QIcon(":/assets/window/minimize.png"));
-    window_close->setIconSize(QSize(10 + 0.5 * std::log(m_min_size), 10 + 0.5 * std::log(m_min_size)));
-    window_min->setIconSize(QSize(10 + 0.5 * std::log(m_min_size), 10 + 0.5 * std::log(m_min_size)));
-    window_close->setFixedSize(18 + 0.5 * std::log(m_min_size), 18 + 0.5 * std::log(m_min_size));
-    window_min->setFixedSize(18 + 0.5 * std::log(m_min_size), 18 + 0.5 * std::log(m_min_size));
+    m_ui->window_close->setIcon(QIcon(":/assets/window/close.png"));
+    m_ui->window_min->setIcon(QIcon(":/assets/window/minimize.png"));
+    m_ui->window_close->setIconSize(QSize(10 + 0.5 * std::log(m_min_size), 10 + 0.5 * std::log(m_min_size)));
+    m_ui->window_min->setIconSize(QSize(10 + 0.5 * std::log(m_min_size), 10 + 0.5 * std::log(m_min_size)));
+    m_ui->window_close->setFixedSize(18 + 0.5 * std::log(m_min_size), 18 + 0.5 * std::log(m_min_size));
+    m_ui->window_min->setFixedSize(18 + 0.5 * std::log(m_min_size), 18 + 0.5 * std::log(m_min_size));
 
-    menu_game->setFont(QFont(m_window_font, 12 + 0.4 * std::log(m_min_size)));
-    menu_help->setFont(QFont(m_window_font, 12 + 0.4 * std::log(m_min_size)));
-    window_title->setFont(QFont(m_window_font, 13 + 0.4 * std::log(m_min_size)));
+    m_ui->menu_game->setFont(QFont(m_window_font, 12 + 0.4 * std::log(m_min_size)));
+    m_ui->menu_help->setFont(QFont(m_window_font, 12 + 0.4 * std::log(m_min_size)));
+    m_ui->window_title->setFont(QFont(m_window_font, 13 + 0.4 * std::log(m_min_size)));
 
-    ctrl_button_restart->setFixedSize(36 + 0.5 * std::log(m_min_size), 36 + 0.5 * std::log(m_min_size));
-    control_widget->setContentsMargins(5, 0, 5, std::log(m_min_size));
-    window_bar->adjustSize();
+    m_ui->ctrl_button_restart->setFixedSize(36 + 0.5 * std::log(m_min_size), 36 + 0.5 * std::log(m_min_size));
+    m_ui->control_widget->setContentsMargins(5, 0, 5, std::log(m_min_size));
+    m_ui->window_bar->adjustSize();
 
     m_flag.addPixmap(QPixmap(":/assets/board/flag.png"), QIcon::Disabled);
     m_mine.addPixmap(QPixmap(":/assets/board/mine.png"), QIcon::Disabled);
@@ -58,41 +60,41 @@ void GameView::setupFontAndIcons() {
 
 void GameView::setupMenu() {
     QMenu* game_menu_inner = new QMenu(this);
-    game_menu_inner->addAction(action_new_game);
+    game_menu_inner->addAction(m_ui->action_new_game);
     game_menu_inner->addSeparator();
-    game_menu_inner->addAction(action_beginner);
-    game_menu_inner->addAction(action_intermediate);
-    game_menu_inner->addAction(action_expert);
+    game_menu_inner->addAction(m_ui->action_beginner);
+    game_menu_inner->addAction(m_ui->action_intermediate);
+    game_menu_inner->addAction(m_ui->action_expert);
     game_menu_inner->addSeparator();
-    game_menu_inner->addAction(action_options);
-    menu_game->setMenu(game_menu_inner);
+    game_menu_inner->addAction(m_ui->action_options);
+    m_ui->menu_game->setMenu(game_menu_inner);
     
-    connect(action_new_game, &QAction::triggered, this, &GameView::onRestart);
-    connect(action_beginner, &QAction::triggered, this, &GameView::onActionBeginner);
-    connect(action_intermediate, &QAction::triggered, this, &GameView::onActionIntermediate);
-    connect(action_expert, &QAction::triggered, this, &GameView::onActionAdvanced);
-    connect(action_options, &QAction::triggered, this, &GameView::onActionOptions);
+    connect(m_ui->action_new_game, &QAction::triggered, this, &GameView::onRestart);
+    connect(m_ui->action_beginner, &QAction::triggered, this, &GameView::onActionBeginner);
+    connect(m_ui->action_intermediate, &QAction::triggered, this, &GameView::onActionIntermediate);
+    connect(m_ui->action_expert, &QAction::triggered, this, &GameView::onActionAdvanced);
+    connect(m_ui->action_options, &QAction::triggered, this, &GameView::onActionOptions);
 
     QMenu* help_menu_inner = new QMenu(this);
-    help_menu_inner->addAction(action_tutorial);
-    help_menu_inner->addAction(action_github);
+    help_menu_inner->addAction(m_ui->action_tutorial);
+    help_menu_inner->addAction(m_ui->action_github);
     help_menu_inner->addSeparator();
-    help_menu_inner->addAction(action_about);
-    menu_help->setMenu(help_menu_inner);
+    help_menu_inner->addAction(m_ui->action_about);
+    m_ui->menu_help->setMenu(help_menu_inner);
 
-    connect(action_tutorial, &QAction::triggered, this, &GameView::onActionTutorial);
-    connect(action_github, &QAction::triggered, this, &GameView::onActionGithub);
-    connect(action_about, &QAction::triggered, this, &GameView::onActionAbout);
+    connect(m_ui->action_tutorial, &QAction::triggered, this, &GameView::onActionTutorial);
+    connect(m_ui->action_github, &QAction::triggered, this, &GameView::onActionGithub);
+    connect(m_ui->action_about, &QAction::triggered, this, &GameView::onActionAbout);
 
-    menu_bar->layout()->setContentsMargins(6, m_min_size / 450, 12, 0);
+    m_ui->menu_bar->layout()->setContentsMargins(6, m_min_size / 450, 12, 0);
 }
 
 void GameView::clearBoard() {
-    delete board_widget_layout;
-    board_widget_layout = new QGridLayout(board_widget);
-    board_widget_layout->setSpacing(0);
-    board_widget_layout->setObjectName("board_widget_layout");
-    board_widget_layout->setContentsMargins(11 + m_min_size / 300, 0, 11 + m_min_size / 300, 12 + m_min_size / 150);
+    delete m_ui->board_widget_layout;
+    m_ui->board_widget_layout = new QGridLayout(m_ui->board_widget);
+    m_ui->board_widget_layout->setSpacing(0);
+    m_ui->board_widget_layout->setObjectName("board_widget_layout");
+    m_ui->board_widget_layout->setContentsMargins(11 + m_min_size / 300, 0, 11 + m_min_size / 300, 12 + m_min_size / 150);
 
     for (int32_t i = 0; i < m_buttons.size(); i++) {
         for (int32_t j = 0; j < m_buttons[0].size(); j++) {
@@ -123,10 +125,10 @@ void GameView::initBoard(const GameBoard& board, const GameState& state, bool fi
     m_buttons.assign(board.rowSize(), std::vector<ButtonView*>(board.colSize(), nullptr));
     for (int32_t i = 0; i < board.rowSize(); i++) {
         // we have to set minimum row height because qt is weird
-        board_widget_layout->setRowMinimumHeight(i, 26 - 2 * std::log(board.rowSize()));
+        m_ui->board_widget_layout->setRowMinimumHeight(i, 26 - 2 * std::log(board.rowSize()));
 
         for (int32_t j = 0; j < board.colSize(); j++) {
-            m_buttons[i][j] = new ButtonView({ i, j }, board_widget);
+            m_buttons[i][j] = new ButtonView({ i, j }, m_ui->board_widget);
             const int32_t btn_size = 30 - 2 * std::log(board.rowSize());
             const int32_t icon_size = 27 - 2 * std::log(board.rowSize());
             m_buttons[i][j]->setFixedSize(btn_size, btn_size);
@@ -137,7 +139,7 @@ void GameView::initBoard(const GameBoard& board, const GameState& state, bool fi
             connect(m_buttons[i][j], &ButtonView::lmbReleasedOutside, this, &GameView::onLmbReleasedOutside);
             connect(m_buttons[i][j], &ButtonView::lmbPressed, this, &GameView::onLmbPressed);
             connect(m_buttons[i][j], &ButtonView::rmbReleased, this, &GameView::onMark);
-            board_widget_layout->addWidget(m_buttons[i][j], i, j);
+            m_ui->board_widget_layout->addWidget(m_buttons[i][j], i, j);
         }
     }
 
@@ -190,11 +192,11 @@ void GameView::renderButton(const GameBoardSquare& square, const GameState& new_
 }
 
 void GameView::setMinesLeft(int new_mines) {
-    mine_display->display(new_mines);
+    m_ui->mine_display->display(new_mines);
 }
 
 void GameView::setTimePassed(int new_time) {
-    timer_display->display(new_time);
+    m_ui->timer_display->display(new_time);
 }
 
 void GameView::onRestart() const {
@@ -269,19 +271,19 @@ void GameView::onActionOptions() const {
 
 void GameView::updateControlIcon(const GameState& state) const {
     if (state.won) {
-        ctrl_button_restart->setIcon(QIcon(":/assets/board/win.png"));
+        m_ui->ctrl_button_restart->setIcon(QIcon(":/assets/board/win.png"));
     } else if (state.lost) {
-        ctrl_button_restart->setIcon(QIcon(":/assets/board/dead.png"));
+        m_ui->ctrl_button_restart->setIcon(QIcon(":/assets/board/dead.png"));
     } else if (state.revealing_mine) {
-        ctrl_button_restart->setIcon(QIcon(":/assets/board/revealing.png"));
+        m_ui->ctrl_button_restart->setIcon(QIcon(":/assets/board/revealing.png"));
     } else {
-        ctrl_button_restart->setIcon(QIcon(":/assets/board/smile.png"));
+        m_ui->ctrl_button_restart->setIcon(QIcon(":/assets/board/smile.png"));
     }
 }
 
 void GameView::mousePressEvent(QMouseEvent* event) {
     QWidget* child = childAt(event->position().toPoint());
-    if (child == window_bar || child == window_title) {
+    if (child == m_ui->window_bar || child == m_ui->window_title) {
         m_prev_position = event->globalPosition();
         m_moving_window = true;
     }
