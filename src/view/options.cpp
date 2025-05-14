@@ -3,7 +3,7 @@
 #include "view/options.h"
 
 OptionsView::OptionsView(const GameSettings& settings, QWidget* parent) : QDialog(parent) {
-    m_ui = new Ui::Options;
+    m_ui = new Ui::Options();
     m_ui->setupUi(this);
     m_settings = settings;
     // sliders

@@ -5,7 +5,7 @@
 #include "view/button.h"
 #include "model/screen.h"
 
-static constexpr const char* button_style = R"(
+static constexpr const char* s_button_style = R"(
 
 /* Regular button styles (non end game) */
 QPushButton#regular {{
@@ -100,7 +100,7 @@ ButtonView::ButtonView(const GameBoardCoord& coord, QWidget* parent) : QPushButt
     m_coord = coord;
     m_clickable = true;
     setStyleSheet(QString::fromStdString(fmt::format(
-        button_style,
+        s_button_style,
         minScreenSize() / 300
     )));
 }
