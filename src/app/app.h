@@ -52,5 +52,5 @@ private:
     GameView* m_game_window = nullptr;
     QTimer* m_timer = nullptr;
 
-    const int32_t min_size = minScreenSize();
+    const int32_t m_min_size = minScreenSize();
 };

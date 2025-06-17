@@ -41,6 +41,4 @@ Note that the open-source distribution of Qt does not provide statically linked 
 
 ## Support
 
-If you encounter any issues or crashes, please file a bug report at the [issues tracker](https://github.com/somedude72/minesweeper/issues). Please include a clear description of the bug, steps to reproduce, and system information in your report. 
-
 Consider starring this repository to support this project.
