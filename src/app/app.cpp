@@ -150,9 +150,9 @@ App::App(int argc, char** argv) : QApplication(argc, argv) {
 
     setStyleSheet(QString::fromStdString(fmt::format(
         s_app_style,
-        min_size / 300,
-        min_size / 450,
-        min_size / 450
+        m_min_size / 300,
+        m_min_size / 450,
+        m_min_size / 450
     )));
 
     m_settings = GameSettings();

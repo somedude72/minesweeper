@@ -50,24 +50,7 @@ struct GameStatistics {
     double play_time;
 };
 
-// TODO: Implement settings/game data save and reload mechanic
-class GameDataManager {
-public:
-    GameDataManager();
-
-    const GameSettings& getSettings() const;
-    GameSettings& getSettings();
-    void loadSettings();
-    void saveSettings();
-
-    const GameStatistics& getStatistics() const;
-    GameStatistics& getStatistics();
-    void loadStatistics();
-    void saveStatistics();
-
-private:
-    QString m_config_path;
-    QString m_stat_path;
-    GameState m_state;
-    GameStatistics m_statistics;
-};
+GameSettings loadSettings();
+GameStatistics loadStatistics();
+void saveSettings();
+void saveStatistics();

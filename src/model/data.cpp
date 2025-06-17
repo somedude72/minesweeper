@@ -3,7 +3,6 @@
 #include <QStandardPaths>
 #include <QString>
 
-// TODO: Implement
-GameDataManager::GameDataManager() {
+GameSettings loadSettings() {
     
 }
